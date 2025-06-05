@@ -4,6 +4,7 @@ import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import Index from './pages';
 import NotFound from './pages/404';
+import Api from './pages/api';
 import ReactGA from 'react-ga4';
 import {
   GOOGLE_ANALYTICS_TRACKING_ID,
@@ -26,6 +27,10 @@ const routes = createBrowserRouter(
     {
       path: 'summary',
       element: withOptionalGAPageTracking(<HomePage />),
+    },
+    {
+      path: 'api/*',
+      element: <Api />,
     },
     {
       path: '*',
