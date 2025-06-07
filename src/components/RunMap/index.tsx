@@ -73,8 +73,8 @@ const RunMap = ({
         }
         // all style resources have been downloaded
         // and the first visually complete rendering of the base style has occurred.
-        // it's odd. when use style other than mapbox, the style.load event is not triggered.
-        // so I use data event instead of style.load event and make sure we handle it only once.
+        // it's odd. when using style other than mapbox's, the style.load event is not triggered.
+        // so I use data event instead of style.load event and make sure the event is handled only once.
         map.on('data', (e) => {
           if (e.dataType !== 'style' || mapRef.current) {
             return;
