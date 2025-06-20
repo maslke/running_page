@@ -3,17 +3,19 @@ import asyncio
 import hashlib
 import os
 import time
+import datetime
 
 import aiofiles
 import httpx
 
 from config import JSON_FILE, SQL_FILE, FOLDER_DICT
-from utils import make_activities_file
+from utils import make_activities_file, save_summary_info_file
 
 COROS_URL_DICT = {
     "LOGIN_URL": "https://teamcnapi.coros.com/account/login",
     "DOWNLOAD_URL": "https://teamcnapi.coros.com/activity/detail/download",
     "ACTIVITY_LIST": "https://teamcnapi.coros.com/activity/query",
+    "ACTIVITY_DETAIL": "https://teamcnapi.coros.com/activity/detail/query?screenW=2042&screenH=1440&labelId={}&sportType={}",
 }
 
 COROS_TYPE_DICT = {
@@ -94,6 +96,24 @@ class Coros:
 
         return all_activities_ids_types
 
+    async def download_activity_summary(self, label_id, sport_type):
+        summary_url = COROS_URL_DICT.get("ACTIVITY_DETAIL").format(label_id, sport_type)
+        summary_info_dict = {}
+        try:
+            response = await self.req.post(summary_url)
+            resp_json = response.json()
+            summary = resp_json.get("data").get("summary")
+            summary_info_dict["distance"] = summary.get("distance") / 100
+            summary_info_dict["average_hr"] = summary.get("avgHr")
+            summary_info_dict["elevation_gain"] = summary.get("elevGain")
+            summary_info_dict["average_speed"] = 1000 / summary.get("avgSpeed")
+            summary_info_dict["elapsed_time"] = summary.get("totalTime") / 100
+            summary_info_dict["moving_time"] = summary.get("workoutTime") / 100
+        except Exception as exc:
+            print(f"Error occurred while downloading {summary_url}: {exc}")
+
+        return summary_info_dict
+
     async def download_activity(self, label_id, sport_type, file_type):
         if sport_type == 101 and file_type == "gpx":
             print(
@@ -162,9 +182,27 @@ async def download_and_generate(account, password, only_run, file_type):
             for label_id in to_generate_coros_ids
         ],
     )
+    await save_activity_summary_file(
+        coros, to_generate_coros_ids, activity_id_type_dict, folder
+    )
     print(f"Download finished. Elapsed {time.time()-start_time} seconds")
     await coros.req.aclose()
     make_activities_file(SQL_FILE, folder, JSON_FILE, file_type)
+
+
+async def save_activity_summary_file(
+    coros, to_generate_coros_ids, activity_id_type_dict, folder
+):
+    coros_summary_infos_dict = {}
+    for id in to_generate_coros_ids:
+        try:
+            coros_summary_infos_dict[id] = await coros.download_activity_summary(
+                id, activity_id_type_dict[id]
+            )
+        except Exception as e:
+            print(f"Failed to get activity summary {id}: {str(e)}")
+            continue
+    save_summary_info_file(coros_summary_infos_dict, folder)
 
 
 async def gather_with_concurrency(n, tasks):

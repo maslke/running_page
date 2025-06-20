@@ -20,8 +20,7 @@ import garth
 import httpx
 from config import FOLDER_DICT, JSON_FILE, SQL_FILE
 from garmin_device_adaptor import wrap_device_info
-from utils import make_activities_file
-from config import SUMMARY_FILE_NAME
+from utils import make_activities_file, save_summary_info_file
 
 # logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -331,7 +330,7 @@ async def download_new_activities(
             print(f"Failed to get activity summary {id}: {str(e)}")
             continue
 
-    _save_summary_info_file(garmin_summary_infos_dict)
+    save_summary_info_file(garmin_summary_infos_dict, folder)
 
     start_time = time.time()
     await gather_with_concurrency(
@@ -345,15 +344,6 @@ async def download_new_activities(
 
     await client.req.aclose()
     return to_generate_garmin_ids, to_generate_garmin_id2title
-
-
-def _save_summary_info_file(garmin_summary_infos_dict):
-    if garmin_summary_infos_dict:
-        if os.path.exists(SUMMARY_FILE_NAME):
-            os.remove(SUMMARY_FILE_NAME)
-        activity_summary_file_path = os.path.join(folder, SUMMARY_FILE_NAME)
-        with open(activity_summary_file_path, "w", encoding="utf-8") as f:
-            json.dump(garmin_summary_infos_dict, f)
 
 
 if __name__ == "__main__":

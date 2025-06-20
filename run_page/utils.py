@@ -179,3 +179,12 @@ def set_summary_info(track_tuple, summary_info_json):
             if summary_info.get("elapsed_time") is None
             else timedelta(seconds=float(summary_info.get("elapsed_time")))
         )
+
+
+def save_summary_info_file(summary_infos_dict, folder):
+    if summary_infos_dict:
+        if os.path.exists(SUMMARY_FILE_NAME):
+            os.remove(SUMMARY_FILE_NAME)
+        activity_summary_file_path = os.path.join(folder, SUMMARY_FILE_NAME)
+        with open(activity_summary_file_path, "w", encoding="utf-8") as f:
+            json.dump(summary_infos_dict, f)
