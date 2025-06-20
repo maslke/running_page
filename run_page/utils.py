@@ -1,6 +1,7 @@
+import os
 import json
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import pytz
 
@@ -11,6 +12,7 @@ except Exception:
 from generator import Generator
 from stravalib.client import Client
 from stravalib.exc import RateLimitExceeded
+from config import SUMMARY_FILE_NAME
 
 
 def adjust_time(time, tz_name):
@@ -51,9 +53,25 @@ def to_date(ts):
 def make_activities_file(
     sql_file, data_dir, json_file, file_suffix="gpx", activity_title_dict={}
 ):
+    track_post_process = None
+    summary_file_path = os.path.join(data_dir, SUMMARY_FILE_NAME)
+    if os.path.exists(summary_file_path):
+        with open(summary_file_path, "r", encoding="utf-8") as f:
+            summary_info_json = json.loads(f.read())
+
+            def wrapper(track_tuple):
+                return set_summary_info(
+                    track_tuple=track_tuple, summary_info_json=summary_info_json
+                )
+
+            track_post_process = lambda track: wrapper(track_tuple=track)
+
     generator = Generator(sql_file)
     generator.sync_from_data_dir(
-        data_dir, file_suffix=file_suffix, activity_title_dict=activity_title_dict
+        data_dir,
+        file_suffix=file_suffix,
+        activity_title_dict=activity_title_dict,
+        track_post_process=track_post_process,
     )
     activities_list = generator.load()
     with open(json_file, "w") as f:
@@ -120,4 +138,44 @@ def upload_file_to_strava(client, file_name, data_type, force_to_run=True):
                 r = client.upload_activity(activity_file=f, data_type=data_type)
         print(
             f"Uploading {data_type} file: {file_name} to strava, upload_id: {r.upload_id}."
+        )
+
+
+def set_summary_info(track_tuple, summary_info_json):
+    file_name, track = track_tuple
+    base_name = os.path.basename(file_name)
+    base_name_without_ext = os.path.splitext(base_name)[0]
+    if summary_info_json and summary_info_json.get(base_name_without_ext):
+        summary_info = summary_info_json.get(base_name_without_ext)
+        track.length = (
+            track.length
+            if summary_info.get("distance") is None
+            else float(summary_info.get("distance"))
+        )
+        track.average_heartrate = (
+            track.average_heartrate
+            if summary_info.get("average_hr") is None
+            else float(summary_info.get("average_hr"))
+        )
+        track.moving_dict["average_speed"] = (
+            track.moving_dict["average_speed"]
+            if summary_info.get("average_speed") is None
+            else float(summary_info.get("average_speed"))
+        )
+        track.moving_dict["distance"] = (
+            track.moving_dict["distance"]
+            if summary_info.get("distance") is None
+            else float(summary_info.get("distance"))
+        )
+
+        track.moving_dict["moving_time"] = (
+            track.moving_dict["moving_time"]
+            if summary_info.get("moving_time") is None
+            else timedelta(seconds=float(summary_info.get("moving_time")))
+        )
+
+        track.moving_dict["elapsed_time"] = (
+            track.moving_dict["elapsed_time"]
+            if summary_info.get("elapsed_time") is None
+            else timedelta(seconds=float(summary_info.get("elapsed_time")))
         )

@@ -75,7 +75,13 @@ class TrackLoader:
             "fit": load_fit_file,
         }
 
-    def load_tracks(self, data_dir, file_suffix="gpx", activity_title_dict={}):
+    def load_tracks(
+        self,
+        data_dir,
+        file_suffix="gpx",
+        activity_title_dict={},
+        track_post_process=None,
+    ):
         """Load tracks data_dir and return as a List of tracks"""
         file_names = [x for x in self._list_data_files(data_dir, file_suffix)]
         print(f"{file_suffix.upper()} files: {len(file_names)}")
@@ -87,6 +93,10 @@ class TrackLoader:
             self.load_func_dict.get(file_suffix, load_gpx_file),
             activity_title_dict,
         )
+
+        if track_post_process:
+            for file_name, track in loaded_tracks.items():
+                track_post_process((file_name, track))
 
         tracks.extend(loaded_tracks.values())
         log.info(f"Conventionally loaded tracks: {len(loaded_tracks)}")

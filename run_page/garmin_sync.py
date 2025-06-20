@@ -13,7 +13,7 @@ import time
 import traceback
 import zipfile
 from io import BytesIO
-from lxml import etree
+import json
 
 import aiofiles
 import garth
@@ -21,6 +21,7 @@ import httpx
 from config import FOLDER_DICT, JSON_FILE, SQL_FILE
 from garmin_device_adaptor import wrap_device_info
 from utils import make_activities_file
+from config import SUMMARY_FILE_NAME
 
 # logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -227,58 +228,10 @@ class GarminConnectAuthenticationError(Exception):
         self.status = status
 
 
-def get_info_text_value(summary_infos, key_name):
-    if summary_infos.get(key_name) is None:
-        return ""
-    return str(summary_infos.get(key_name))
-
-
-def create_element(parent, tag, text):
-    elem = etree.SubElement(parent, tag)
-    elem.text = text
-    elem.tail = "\n"
-    return elem
-
-
-def add_summary_info(file_data, summary_infos, fields=None):
-    if summary_infos is None:
-        return file_data
-    try:
-        root = etree.fromstring(file_data)
-        extensions_node = etree.Element("extensions")
-        extensions_node.text = "\n"
-        extensions_node.tail = "\n"
-        if fields is None:
-            fields = [
-                "distance",
-                "average_hr",
-                "average_speed",
-                "start_time",
-                "end_time",
-                "moving_time",
-                "elapsed_time",
-            ]
-        for field in fields:
-            create_element(
-                extensions_node, field, get_info_text_value(summary_infos, field)
-            )
-        root.insert(0, extensions_node)
-        return etree.tostring(root, encoding="utf-8", pretty_print=True)
-    except etree.XMLSyntaxError as e:
-        print(f"Failed to parse file data: {str(e)}")
-    except Exception as e:
-        print(f"Failed to append summary info to file data: {str(e)}")
-    return file_data
-
-
-async def download_garmin_data(
-    client, activity_id, file_type="gpx", summary_infos=None
-):
+async def download_garmin_data(client, activity_id, file_type="gpx"):
     folder = FOLDER_DICT.get(file_type, "gpx")
     try:
         file_data = await client.download_activity(activity_id, file_type=file_type)
-        if summary_infos is not None:
-            file_data = add_summary_info(file_data, summary_infos.get(activity_id))
         file_path = os.path.join(folder, f"{activity_id}.{file_type}")
         need_unzip = False
         if file_type == "fit":
@@ -354,7 +307,7 @@ def get_garmin_summary_infos(activity_summary, activity_id):
 
 
 async def download_new_activities(
-    secret_string, auth_domain, downloaded_ids, is_only_running, folder, file_type
+    secret_string, auth_domain, downloaded_ids, is_only_running, file_type
 ):
     client = Garmin(secret_string, auth_domain, is_only_running)
     # because I don't find a para for after time, so I use garmin-id as filename
@@ -365,6 +318,7 @@ async def download_new_activities(
 
     to_generate_garmin_id2title = {}
     garmin_summary_infos_dict = {}
+
     for id in to_generate_garmin_ids:
         try:
             activity_summary = await client.get_activity_summary(id)
@@ -377,13 +331,13 @@ async def download_new_activities(
             print(f"Failed to get activity summary {id}: {str(e)}")
             continue
 
+    _save_summary_info_file(garmin_summary_infos_dict)
+
     start_time = time.time()
     await gather_with_concurrency(
         10,
         [
-            download_garmin_data(
-                client, id, file_type=file_type, summary_infos=garmin_summary_infos_dict
-            )
+            download_garmin_data(client, id, file_type=file_type)
             for id in to_generate_garmin_ids
         ],
     )
@@ -391,6 +345,15 @@ async def download_new_activities(
 
     await client.req.aclose()
     return to_generate_garmin_ids, to_generate_garmin_id2title
+
+
+def _save_summary_info_file(garmin_summary_infos_dict):
+    if garmin_summary_infos_dict:
+        if os.path.exists(SUMMARY_FILE_NAME):
+            os.remove(SUMMARY_FILE_NAME)
+        activity_summary_file_path = os.path.join(folder, SUMMARY_FILE_NAME)
+        with open(activity_summary_file_path, "w", encoding="utf-8") as f:
+            json.dump(garmin_summary_infos_dict, f)
 
 
 if __name__ == "__main__":
@@ -455,7 +418,6 @@ if __name__ == "__main__":
             auth_domain,
             downloaded_ids,
             is_only_running,
-            folder,
             file_type,
         )
     )

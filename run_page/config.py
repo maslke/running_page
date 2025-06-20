@@ -26,3 +26,5 @@ UTC_TIMEZONE = "UTC"
 
 start_point = namedtuple("start_point", "lat lon")
 run_map = namedtuple("polyline", "summary_polyline")
+
+SUMMARY_FILE_NAME = "activity_summary.json"
