@@ -44,7 +44,7 @@ const RunRow = ({
       className={
         clsx(
           styles.runRow,
-          runIndex === elementIndex && "text-text-selected"
+          runIndex === elementIndex && "text-text-hover"
         )
       }
       key={run.start_date_local}
