@@ -20,17 +20,15 @@
   width: 100%;
   font-variant: tabular-nums;
   margin: 2rem 0 5rem 0;
-  color: rgb(204, 204, 204);
-  background-color: rgb(26, 26, 26);
+}
 
-  :is(thead) {
-    color: rgb(204, 204, 204);
-    text-align: right;
+.runTable thead {
+  text-align: right;
+}
 
-    :is(th) {
-      padding: 0.5rem;
-    }
-  }
+.runTable thead th {
+  padding: 0.5rem;
+
 }
 
 .runRow {
@@ -44,21 +42,9 @@
       text-align: left;
     }
   }
-
-  &:hover {
-    background-color: lighten(rgb(26, 26, 26), 3%);
-  }
-}
-
-.selected {
-  color: rgb(224, 237, 94);
 }
 
 .tableContainer {
   width: 100%;
   overflow-x: auto;
-}
-
-.runDate {
-  color: rgb(204, 204, 204);
 }

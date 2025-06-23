@@ -7,6 +7,7 @@ import {
 } from '@/utils/utils';
 import { SHOW_ELEVATION_GAIN } from '@/utils/const';
 import styles from './style.module.css';
+import clsx from "clsx";
 
 interface IRunRowProperties {
   elementIndex: number;
@@ -40,7 +41,12 @@ const RunRow = ({
 
   return (
     <tr
-      className={`${styles.runRow} ${runIndex === elementIndex ? styles.selected : ''}`}
+      className={
+        clsx(
+          styles.runRow,
+          runIndex === elementIndex && "text-text-selected"
+        )
+      }
       key={run.start_date_local}
       onClick={handleClick}
     >
@@ -50,7 +56,7 @@ const RunRow = ({
       {paceParts && <td>{paceParts}</td>}
       <td>{heartRate && heartRate.toFixed(0)}</td>
       <td>{runTime}</td>
-      <td className={styles.runDate}>{run.start_date_local}</td>
+      <td className="text-text">{run.start_date_local}</td>
     </tr>
   );
 };

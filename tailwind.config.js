@@ -15,7 +15,14 @@ export default {
         'sans-serif',
       ],
     },
-    extend: {},
+    extend: {
+      colors: {
+        background: 'var(--color-background)',
+        text: 'var(--color-text)',
+        primary: 'var(--color-primary)',
+        'primary-hover': 'var(--color-primary-hover)'
+      }
+    },
   },
   plugins: [],
 };

@@ -1,5 +1,19 @@
 @import 'tailwindcss';
 
+@theme {
+  --color-background: #1a1a1a;
+  --color-text: #cccccc;
+  --color-primary: #e0ed5e;
+  --color-text-selected: #e0ed5e;
+}
+
+/*@theme .bright {*/
+/*  --color-background: #edebeb;*/
+/*  --color-text: #00afaa;*/
+/*  --color-primary: #00afaa;*/
+/*  --color-text-selected: #1b2b38;*/
+/*}*/
+
 img::selection {
   background: transparent;
 }

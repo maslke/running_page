@@ -10,6 +10,7 @@ import { SHOW_ELEVATION_GAIN } from '@/utils/const';
 
 import RunRow from './RunRow';
 import styles from './style.module.css';
+import clsx from "clsx";
 
 interface IRunTableProperties {
   runs: Activity[];
@@ -77,8 +78,14 @@ const RunTable = ({
 
   return (
     <div className={styles.tableContainer}>
-      <table className={styles.runTable} cellSpacing="0" cellPadding="0">
-        <thead>
+      <table className={
+        clsx(
+          styles.runTable,
+          "text-text",
+          "bg-background"
+        )
+      } cellSpacing="0" cellPadding="0">
+        <thead className="text-text">
           <tr>
             <th />
             {Array.from(sortFuncMap.keys()).map((k) => (

@@ -23,6 +23,9 @@ dependencies:
   '@vitejs/plugin-react':
     specifier: ^4.0.4
     version: 4.0.4(vite@4.4.9)
+  clsx:
+    specifier: ^2.1.1
+    version: 2.1.1
   gcoord:
     specifier: ^0.3.2
     version: 0.3.2
