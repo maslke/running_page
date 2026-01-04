@@ -7,7 +7,7 @@ import {
 } from '@/utils/const';
 import styles from './style.module.css';
 
-const TOTAL_BLOCKS = 10;
+const TOTAL_BLOCKS = 50;
 
 const MetallicProgressBar = ({
   currentDistance,
@@ -33,7 +33,7 @@ const MetallicProgressBar = ({
       onMouseLeave={() => setIsHovered(false)}
     >
       <div className={styles.progressLabel}>
-        {latestYear} 计划完成距离：{targetDistance} km，已完成：
+        {latestYear} 计划完成距离：{targetDistance} km，当前已完成：{currentDistance.toFixed(1)} km。
       </div>
       <div className={styles.progressBlocks}>
         {Array.from({ length: TOTAL_BLOCKS }).map((_, index) => {
