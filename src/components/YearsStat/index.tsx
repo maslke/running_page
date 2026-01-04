@@ -1,7 +1,52 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import YearStat from '@/components/YearStat';
 import useActivities from '@/hooks/useActivities';
-import { INFO_MESSAGE } from '@/utils/const';
+import {
+  INFO_MESSAGE,
+  PLAN_TOTAL_DISTANCE_OF_CURRENT_YEAR,
+} from '@/utils/const';
+import styles from './style.module.css';
+
+const TOTAL_BLOCKS = 10;
+
+const MetallicProgressBar = ({
+  currentDistance,
+  targetDistance,
+}: {
+  currentDistance: number;
+  targetDistance: number;
+}) => {
+  const [isHovered, setIsHovered] = useState(false);
+
+  const progressPercent = Math.min(
+    (currentDistance / targetDistance) * 100,
+    100
+  );
+  const filledBlocks = Math.floor((progressPercent / 100) * TOTAL_BLOCKS);
+
+  return (
+    <div
+      className={styles.progressContainer}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <div className={styles.progressBlocks}>
+        {Array.from({ length: TOTAL_BLOCKS }).map((_, index) => {
+          const isFilled = index < filledBlocks;
+          return (
+            <div
+              key={index}
+              className={`${styles.progressBlock} ${isFilled ? styles.filledBlock : styles.emptyBlock}`}
+            />
+          );
+        })}
+      </div>
+      {isHovered && (
+        <div className={styles.tooltip}>{progressPercent.toFixed(1)}%</div>
+      )}
+    </div>
+  );
+};
 
 const YearsStat = ({
   year,
@@ -10,11 +55,9 @@ const YearsStat = ({
   year: string;
   onClick: (_year: string) => void;
 }) => {
-  const { years } = useActivities();
+  const { years, thisYear, activities } = useActivities();
 
-  // Memoize the years array calculation
   const yearsArrayUpdate = useMemo(() => {
-    // make sure the year click on front
     let updatedYears = years.slice();
     updatedYears.push('Total');
     updatedYears = updatedYears.filter((x) => x !== year);
@@ -26,7 +69,17 @@ const YearsStat = ({
     return INFO_MESSAGE(years.length, year);
   }, [years.length, year]);
 
-  // for short solution need to refactor
+  const currentYearDistance = useMemo(() => {
+    const thisYearRuns = activities.filter(
+      (run) => run.start_date_local.slice(0, 4) === thisYear
+    );
+    const totalDistance = thisYearRuns.reduce(
+      (sum, run) => sum + (run.distance || 0),
+      0
+    );
+    return totalDistance / 1000;
+  }, [activities, thisYear]);
+
   return (
     <div className="w-full pb-16 pr-16 lg:w-full lg:pr-16">
       <section className="pb-0">
@@ -36,8 +89,15 @@ const YearsStat = ({
         </p>
       </section>
       <hr />
+      <MetallicProgressBar
+        currentDistance={currentYearDistance}
+        targetDistance={PLAN_TOTAL_DISTANCE_OF_CURRENT_YEAR}
+      />
       {yearsArrayUpdate.map((yearItem) => (
-        <YearStat key={yearItem} year={yearItem} onClick={onClick} />
+        <div key={yearItem}>
+          <hr />
+          <YearStat year={yearItem} onClick={onClick} />
+        </div>
       ))}
     </div>
   );
