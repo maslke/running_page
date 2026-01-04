@@ -15,9 +15,7 @@ const YearStat = ({
   onClick: (_year: string) => void;
 }) => {
   let { activities: runs, years } = useActivities();
-  // for hover
   const [hovered, eventHandlers] = useHover();
-  // lazy Component
   const YearSVG = lazy(() => loadSvgComponent(yearStats, `./year_${year}.svg`));
 
   if (years.includes(year)) {
@@ -58,6 +56,7 @@ const YearStat = ({
   const avgHeartRate = (heartRate / (runs.length - heartRateNullCount)).toFixed(
     0
   );
+
   return (
     <div className="cursor-pointer" onClick={() => onClick(year)}>
       <section {...eventHandlers}>
@@ -78,7 +77,6 @@ const YearStat = ({
           <YearSVG className="year-svg my-4 h-4/6 w-4/6 border-0 p-0" />
         </Suspense>
       )}
-      <hr />
     </div>
   );
 };

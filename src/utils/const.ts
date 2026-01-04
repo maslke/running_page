@@ -30,6 +30,8 @@ const MAP_LAYER_LIST = [
 const USE_GOOGLE_ANALYTICS = false;
 const GOOGLE_ANALYTICS_TRACKING_ID = '';
 
+const PLAN_TOTAL_DISTANCE_OF_CURRENT_YEAR = 1000;
+
 // styling: set to `true` if you want dash-line route
 const USE_DASH_LINE = true;
 // styling: route line opacity: [0, 1]
@@ -164,6 +166,7 @@ export {
   ACTIVITY_TOTAL,
   HOME_PAGE_TITLE,
   LOADING_TEXT,
+  PLAN_TOTAL_DISTANCE_OF_CURRENT_YEAR,
 };
 
 const nike = 'rgb(224,237,94)'; // if you want to change the main color, modify this value in src/styles/variables.scss

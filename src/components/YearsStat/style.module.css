@@ -1,0 +1,58 @@
+.progressContainer {
+  position: relative;
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
+  cursor: pointer;
+}
+
+.progressBlocks {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.progressBlock {
+  height: 1rem;
+  flex: 1;
+  border-radius: 0.125rem;
+  transition:
+    transform 150ms,
+    background 0.1s ease,
+    box-shadow 0.1s ease,
+    border 0.1s ease;
+}
+
+.progressContainer:hover .progressBlock {
+  transform: scale(1.05);
+}
+
+.filledBlock {
+  background: var(--progress-filled-bg);
+  box-shadow: var(--progress-filled-shadow);
+  border: var(--progress-filled-border);
+}
+
+.emptyBlock {
+  background: var(--progress-empty-bg);
+  box-shadow: var(--progress-empty-shadow);
+  border: var(--progress-empty-border);
+}
+
+.tooltip {
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  z-index: 10;
+  margin-top: 0.25rem;
+  transform: translateX(-50%);
+  border-radius: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  background: var(--progress-tooltip-bg);
+  color: var(--progress-tooltip-color);
+  border: var(--progress-tooltip-border);
+}
