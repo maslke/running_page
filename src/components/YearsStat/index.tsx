@@ -12,9 +12,11 @@ const TOTAL_BLOCKS = 10;
 const MetallicProgressBar = ({
   currentDistance,
   targetDistance,
+  latestYear,
 }: {
   currentDistance: number;
   targetDistance: number;
+  latestYear: string;
 }) => {
   const [isHovered, setIsHovered] = useState(false);
 
@@ -30,6 +32,9 @@ const MetallicProgressBar = ({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
+      <div className={styles.progressLabel}>
+        {latestYear} 计划完成距离：{targetDistance} km，已完成：
+      </div>
       <div className={styles.progressBlocks}>
         {Array.from({ length: TOTAL_BLOCKS }).map((_, index) => {
           const isFilled = index < filledBlocks;
@@ -92,6 +97,7 @@ const YearsStat = ({
       <MetallicProgressBar
         currentDistance={currentYearDistance}
         targetDistance={PLAN_TOTAL_DISTANCE_OF_CURRENT_YEAR}
+        latestYear={thisYear}
       />
       {yearsArrayUpdate.map((yearItem) => (
         <div key={yearItem}>

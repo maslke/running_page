@@ -5,6 +5,11 @@
   cursor: pointer;
 }
 
+.progressLabel {
+  color: var(--color-primary);
+  margin-bottom: 0.5rem;
+}
+
 .progressBlocks {
   display: flex;
   align-items: center;
