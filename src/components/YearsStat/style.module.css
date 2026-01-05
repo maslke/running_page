@@ -10,6 +10,15 @@
   margin-bottom: 0.5rem;
 }
 
+.percentNumber {
+  font-size: 1.25em;
+  font-weight: 600;
+}
+
+.percentSymbol {
+  font-size: 1em;
+}
+
 .progressBlocks {
   display: flex;
   align-items: center;

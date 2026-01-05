@@ -10,20 +10,16 @@ import styles from './style.module.css';
 const TOTAL_BLOCKS = 50;
 
 const MetallicProgressBar = ({
-  currentDistance,
-  targetDistance,
-  latestYear,
+  labelPrefix,
+  displayPercent,
+  progressPercent,
 }: {
-  currentDistance: number;
-  targetDistance: number;
-  latestYear: string;
+  labelPrefix: string;
+  displayPercent: number;
+  progressPercent: number;
 }) => {
   const [isHovered, setIsHovered] = useState(false);
 
-  const progressPercent = Math.min(
-    (currentDistance / targetDistance) * 100,
-    100
-  );
   const filledBlocks = Math.floor((progressPercent / 100) * TOTAL_BLOCKS);
 
   return (
@@ -33,7 +29,11 @@ const MetallicProgressBar = ({
       onMouseLeave={() => setIsHovered(false)}
     >
       <div className={styles.progressLabel}>
-        {latestYear} 计划完成距离：{targetDistance} km，当前已完成：{currentDistance.toFixed(1)} km。
+        {labelPrefix}
+        <span className={styles.percentNumber}>
+          {displayPercent.toFixed(1)}
+        </span>{' '}
+        <span className={styles.percentSymbol}>%</span>
       </div>
       <div className={styles.progressBlocks}>
         {Array.from({ length: TOTAL_BLOCKS }).map((_, index) => {
@@ -51,6 +51,18 @@ const MetallicProgressBar = ({
       )}
     </div>
   );
+};
+
+const getYearProgress = () => {
+  const now = new Date();
+  const startOfYear = new Date(now.getFullYear(), 0, 1);
+  const endOfYear = new Date(now.getFullYear() + 1, 0, 1);
+  const totalMs = endOfYear.getTime() - startOfYear.getTime();
+  const elapsedMs = now.getTime() - startOfYear.getTime();
+  const percent = (elapsedMs / totalMs) * 100;
+  const elapsedDays = Math.floor(elapsedMs / (1000 * 60 * 60 * 24));
+  const totalDays = Math.floor(totalMs / (1000 * 60 * 60 * 24));
+  return { percent, elapsedDays, totalDays };
 };
 
 const YearsStat = ({
@@ -85,6 +97,8 @@ const YearsStat = ({
     return totalDistance / 1000;
   }, [activities, thisYear]);
 
+  const yearProgress = useMemo(() => getYearProgress(), []);
+
   return (
     <div className="w-full pb-16 pr-16 lg:w-full lg:pr-16">
       <section className="pb-0">
@@ -95,9 +109,20 @@ const YearsStat = ({
       </section>
       <hr />
       <MetallicProgressBar
-        currentDistance={currentYearDistance}
-        targetDistance={PLAN_TOTAL_DISTANCE_OF_CURRENT_YEAR}
-        latestYear={thisYear}
+        labelPrefix={`${thisYear} 跑步进度：`}
+        displayPercent={Math.min(
+          (currentYearDistance / PLAN_TOTAL_DISTANCE_OF_CURRENT_YEAR) * 100,
+          100
+        )}
+        progressPercent={Math.min(
+          (currentYearDistance / PLAN_TOTAL_DISTANCE_OF_CURRENT_YEAR) * 100,
+          100
+        )}
+      />
+      <MetallicProgressBar
+        labelPrefix={`${thisYear} 时间进度：`}
+        displayPercent={yearProgress.percent}
+        progressPercent={yearProgress.percent}
       />
       {yearsArrayUpdate.map((yearItem) => (
         <div key={yearItem}>
