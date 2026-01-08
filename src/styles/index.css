@@ -98,6 +98,17 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.5), inset 0 -1px 0 rgba(0, 0, 0, 0.2),
     0 1px 3px rgba(0, 0, 0, 0.15);
   --progress-filled-border: 1px solid rgba(0, 0, 0, 0.15);
+  --progress-partial-bg: linear-gradient(
+    180deg,
+    #ffd700 0%,
+    #ffb347 30%,
+    #ff9500 70%,
+    #e68a00 100%
+  );
+  --progress-partial-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5), inset 0 -1px 0 rgba(0, 0, 0, 0.2),
+    0 1px 2px rgba(0, 0, 0, 0.15);
+  --progress-partial-border: 1px solid rgba(0, 0, 0, 0.15);
   --progress-empty-bg: linear-gradient(
     180deg,
     #e8e8e8 0%,
@@ -143,6 +154,17 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.3), inset 0 -1px 0 rgba(0, 0, 0, 0.3),
     0 1px 2px rgba(0, 0, 0, 0.2);
   --progress-filled-border: 1px solid rgba(0, 0, 0, 0.3);
+  --progress-partial-bg: linear-gradient(
+    180deg,
+    #ffe066 0%,
+    #ffc940 30%,
+    #faad14 70%,
+    #d99a00 100%
+  );
+  --progress-partial-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35), inset 0 -1px 0 rgba(0, 0, 0, 0.25),
+    0 1px 2px rgba(0, 0, 0, 0.2);
+  --progress-partial-border: 1px solid rgba(0, 0, 0, 0.25);
   --progress-empty-bg: linear-gradient(
     180deg,
     #4a4a4a 0%,
