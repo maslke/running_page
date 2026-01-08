@@ -46,6 +46,12 @@
   border: var(--progress-filled-border);
 }
 
+.partialBlock {
+  background: var(--progress-partial-bg);
+  box-shadow: var(--progress-partial-shadow);
+  border: var(--progress-partial-border);
+}
+
 .emptyBlock {
   background: var(--progress-empty-bg);
   box-shadow: var(--progress-empty-shadow);

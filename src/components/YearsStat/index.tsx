@@ -20,7 +20,20 @@ const MetallicProgressBar = ({
 }) => {
   const [isHovered, setIsHovered] = useState(false);
 
-  const filledBlocks = Math.floor((progressPercent / 100) * TOTAL_BLOCKS);
+  const percentPerBlock = 100 / TOTAL_BLOCKS;
+  const filledBlocks = Math.floor(progressPercent / percentPerBlock);
+  const remainder = progressPercent % percentPerBlock;
+  const hasPartialBlock = remainder >= 1 && filledBlocks < TOTAL_BLOCKS;
+
+  const getBlockClassName = (index: number) => {
+    if (index < filledBlocks) {
+      return `${styles.progressBlock} ${styles.filledBlock}`;
+    }
+    if (index === filledBlocks && hasPartialBlock) {
+      return `${styles.progressBlock} ${styles.partialBlock}`;
+    }
+    return `${styles.progressBlock} ${styles.emptyBlock}`;
+  };
 
   return (
     <div
@@ -36,15 +49,9 @@ const MetallicProgressBar = ({
         <span className={styles.percentSymbol}>%</span>
       </div>
       <div className={styles.progressBlocks}>
-        {Array.from({ length: TOTAL_BLOCKS }).map((_, index) => {
-          const isFilled = index < filledBlocks;
-          return (
-            <div
-              key={index}
-              className={`${styles.progressBlock} ${isFilled ? styles.filledBlock : styles.emptyBlock}`}
-            />
-          );
-        })}
+        {Array.from({ length: TOTAL_BLOCKS }).map((_, index) => (
+          <div key={index} className={getBlockClassName(index)} />
+        ))}
       </div>
       {isHovered && (
         <div className={styles.tooltip}>{progressPercent.toFixed(1)}%</div>
