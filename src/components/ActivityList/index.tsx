@@ -25,6 +25,7 @@ import { totalStat, yearSummaryStats } from '@assets/index';
 import { loadSvgComponent } from '@/utils/svgUtils';
 import { SHOW_ELEVATION_GAIN, HOME_PAGE_TITLE } from '@/utils/const';
 import RoutePreview from '@/components/RoutePreview';
+import ExportButton from '@/components/ExportButton';
 import { Activity } from '@/utils/utils';
 // Layout constants (avoid magic numbers)
 const ITEM_WIDTH = 280;
@@ -133,19 +134,19 @@ const ActivityCardInner: React.FC<ActivityCardProps> = ({
   const generateLabels = (): number[] => {
     if (interval === 'month') {
       const [year, month] = period.split('-').map(Number);
-      const daysInMonth = new Date(year, month, 0).getDate(); // Get the number of days in the month
+      const daysInMonth = new Date(year, month, 0).getDate();
       return Array.from({ length: daysInMonth }, (_, i) => i + 1);
     } else if (interval === 'week') {
       return Array.from({ length: 7 }, (_, i) => i + 1);
     } else if (interval === 'year') {
-      return Array.from({ length: 12 }, (_, i) => i + 1); // Generate months 1 to 12
+      return Array.from({ length: 12 }, (_, i) => i + 1);
     }
     return [];
   };
 
   const data: ChartData[] = generateLabels().map((day) => ({
     day,
-    distance: (dailyDistances[day - 1] || 0).toFixed(2), // Keep two decimal places
+    distance: (dailyDistances[day - 1] || 0).toFixed(2),
   }));
 
   const formatTime = (seconds: number): string => {
@@ -157,24 +158,32 @@ const ActivityCardInner: React.FC<ActivityCardProps> = ({
 
   const formatPace = (speed: number): string => {
     if (speed === 0) return '0:00 min/km';
-    const pace = 60 / speed; // min/km
-    const totalSeconds = Math.round(pace * 60); // Total seconds per km
+    const pace = 60 / speed;
+    const totalSeconds = Math.round(pace * 60);
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
     return `${minutes}:${seconds < 10 ? '0' : ''}${seconds} min/km`;
   };
 
-  // Calculate Y-axis maximum value and ticks
+  const [isHovered, setIsHovered] = useState(false);
+
+  const cardRef = useRef<HTMLDivElement>(null);
+  const cardFrontRef = useRef<HTMLDivElement>(null);
+  const cardBackRef = useRef<HTMLDivElement>(null);
+
   const yAxisMax = Math.ceil(
     Math.max(...data.map((d) => parseFloat(d.distance))) + 10
-  ); // Round up and add buffer
+  );
   const yAxisTicks = Array.from(
     { length: Math.ceil(yAxisMax / 5) + 1 },
     (_, i) => i * 5
-  ); // Generate arithmetic sequence
+  );
 
   return (
     <div
+      ref={cardRef}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       className={`${styles.activityCard} ${interval === 'day' ? styles.activityCardFlippable : ''}`}
       onClick={handleCardClick}
       style={{
@@ -182,9 +191,21 @@ const ActivityCardInner: React.FC<ActivityCardProps> = ({
           interval === 'day' && activities.length > 0 ? 'pointer' : 'default',
       }}
     >
+      {isHovered && (
+        <ExportButton
+          targetRef={
+            interval === 'day'
+              ? isFlipped
+                ? cardBackRef
+                : cardFrontRef
+              : cardRef
+          }
+          filename={`activity-${period}`}
+        />
+      )}
       <div className={`${styles.cardInner} ${isFlipped ? styles.flipped : ''}`}>
         {/* Front side - Activity details */}
-        <div className={styles.cardFront}>
+        <div ref={cardFrontRef} className={styles.cardFront}>
           <h2 className={styles.activityName}>{period}</h2>
           <div className={styles.activityDetails}>
             <p>
@@ -279,7 +300,7 @@ const ActivityCardInner: React.FC<ActivityCardProps> = ({
 
         {/* Back side - Route preview */}
         {interval === 'day' && activities.length > 0 && (
-          <div className={styles.cardBack}>
+          <div ref={cardBackRef} className={styles.cardBack}>
             <div className={styles.routeContainer}>
               <RoutePreview activities={activities} />
             </div>
