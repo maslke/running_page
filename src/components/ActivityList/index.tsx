@@ -30,6 +30,7 @@ import { Activity } from '@/utils/utils';
 // Layout constants (avoid magic numbers)
 const ITEM_WIDTH = 280;
 const ITEM_GAP = 20;
+const EXPORT_CARDS_PER_ROW = 6;
 
 const VIRTUAL_LIST_STYLES = {
   horizontalScrollBar: {},
@@ -351,6 +352,8 @@ const ActivityList: React.FC = () => {
   const [sportType, setSportType] = useState<string>('all');
   const [sportTypeOptions, setSportTypeOptions] = useState<string[]>([]);
   const [selectedYear, setSelectedYear] = useState<string | null>(null);
+  const [isExportingAll, setIsExportingAll] = useState(false);
+  const exportAllRef = useRef<HTMLDivElement | null>(null);
 
   // Get available years from activities
   const availableYears = useMemo(() => {
@@ -714,6 +717,55 @@ const ActivityList: React.FC = () => {
 
   const loading = itemsPerRow < 1 || !rowHeight;
 
+  const exportRowGroups = useMemo(() => {
+    const groupLength = Math.ceil(dataList.length / EXPORT_CARDS_PER_ROW);
+    const arr: RowGroup[] = [];
+    for (let i = 0; i < groupLength; i++) {
+      const start = i * EXPORT_CARDS_PER_ROW;
+      arr.push(dataList.slice(start, start + EXPORT_CARDS_PER_ROW));
+    }
+    return arr;
+  }, [dataList]);
+
+  const handleExportAll = useCallback(async () => {
+    if (isExportingAll || dataList.length === 0) return;
+    setIsExportingAll(true);
+
+    await new Promise((resolve) => setTimeout(resolve, 300));
+
+    try {
+      const { domToPng } = await import('modern-screenshot');
+      if (!exportAllRef.current) {
+        setIsExportingAll(false);
+        return;
+      }
+
+      const el = exportAllRef.current;
+      el.style.opacity = '1';
+      el.style.position = 'relative';
+      el.style.zIndex = 'auto';
+
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      const dataUrl = await domToPng(el, {
+        scale: 2,
+      });
+
+      el.style.opacity = '0';
+      el.style.position = 'absolute';
+      el.style.zIndex = '-9999';
+
+      const link = document.createElement('a');
+      link.download = `activities-${sportType}-${interval}.png`;
+      link.href = dataUrl;
+      link.click();
+    } catch (error) {
+      console.error('Export all failed:', error);
+    } finally {
+      setIsExportingAll(false);
+    }
+  }, [isExportingAll, dataList.length, sportType, interval]);
+
   return (
     <div className={styles.activityList}>
       <div className={styles.filterContainer} ref={filterRef}>
@@ -744,6 +796,34 @@ const ActivityList: React.FC = () => {
           <option value="day">{ACTIVITY_TOTAL.DAILY_TITLE}</option>
           <option value="life">Life</option>
         </select>
+        {interval === 'year' && (
+          <button
+            className={styles.exportAllButton}
+            onClick={handleExportAll}
+            disabled={isExportingAll || dataList.length === 0}
+            title="导出所有卡片为图片"
+          >
+            {isExportingAll ? (
+              <span className={styles.exportAllSpinner} />
+            ) : (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+            )}
+          </button>
+        )}
       </div>
 
       {interval === 'life' && (
@@ -915,6 +995,48 @@ const ActivityList: React.FC = () => {
               )}
             </div>
           </div>
+
+          {isExportingAll && (
+            <div ref={exportAllRef} className={styles.exportAllContainer}>
+              {exportRowGroups.map((row, rowIndex) => (
+                <div key={rowIndex} className={styles.exportAllRow}>
+                  {row.map((cardData) => (
+                    <ActivityCard
+                      key={cardData.period}
+                      period={cardData.period}
+                      summary={{
+                        totalDistance: cardData.summary.totalDistance,
+                        averageSpeed: cardData.summary.totalTime
+                          ? cardData.summary.totalDistance /
+                            (cardData.summary.totalTime / 3600)
+                          : 0,
+                        totalTime: cardData.summary.totalTime,
+                        count: cardData.summary.count,
+                        maxDistance: cardData.summary.maxDistance,
+                        maxSpeed: cardData.summary.maxSpeed,
+                        location: cardData.summary.location,
+                        totalElevationGain: SHOW_ELEVATION_GAIN
+                          ? cardData.summary.totalElevationGain
+                          : undefined,
+                        averageHeartRate:
+                          cardData.summary.heartRateCount > 0
+                            ? cardData.summary.totalHeartRate /
+                              cardData.summary.heartRateCount
+                            : undefined,
+                      }}
+                      dailyDistances={cardData.summary.dailyDistances}
+                      interval={interval}
+                      activities={
+                        interval === 'day'
+                          ? cardData.summary.activities
+                          : undefined
+                      }
+                    />
+                  ))}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>
