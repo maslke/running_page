@@ -27,6 +27,7 @@
 .filterContainer {
   display: flex;
   justify-content: center;
+  align-items: center;
   gap: 10px;
   margin-bottom: 20px;
   overflow: visible;
@@ -242,4 +243,73 @@
 .lifeContainer :global(svg) {
   max-width: 100%;
   height: auto;
+}
+
+.exportAllButton {
+  width: 40px;
+  padding: 10px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-primary);
+  color: var(--color-background);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  box-sizing: border-box;
+  transition:
+    opacity 0.2s,
+    transform 0.2s,
+    background-color 0.2s;
+}
+
+.exportAllButton:hover {
+  background-color: var(--color-secondary, var(--color-primary));
+  transform: scale(1.05);
+}
+
+.exportAllButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.exportAllButton svg {
+  width: 18px;
+  height: 18px;
+}
+
+.exportAllSpinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--color-background);
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: exportAllSpin 0.8s linear infinite;
+}
+
+@keyframes exportAllSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.exportAllContainer {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: -9999;
+  opacity: 0;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+  background-color: var(--color-background);
+  width: max-content;
+}
+
+.exportAllRow {
+  display: flex;
+  gap: 20px;
+  justify-content: flex-start;
 }
