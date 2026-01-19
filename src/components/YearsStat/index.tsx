@@ -93,16 +93,20 @@ const YearsStat = ({
     return INFO_MESSAGE(years.length, year);
   }, [years.length, year]);
 
+  const currentActualYear = useMemo(() => {
+    return new Date().getFullYear().toString();
+  }, []);
+
   const currentYearDistance = useMemo(() => {
-    const thisYearRuns = activities.filter(
-      (run) => run.start_date_local.slice(0, 4) === thisYear
+    const currentYearRuns = activities.filter(
+      (run) => run.start_date_local.slice(0, 4) === currentActualYear
     );
-    const totalDistance = thisYearRuns.reduce(
+    const totalDistance = currentYearRuns.reduce(
       (sum, run) => sum + (run.distance || 0),
       0
     );
     return totalDistance / 1000;
-  }, [activities, thisYear]);
+  }, [activities, currentActualYear]);
 
   const yearProgress = useMemo(() => getYearProgress(), []);
 
@@ -116,7 +120,7 @@ const YearsStat = ({
       </section>
       <hr />
       <MetallicProgressBar
-        labelPrefix={`${thisYear} 跑步进度：`}
+        labelPrefix={`${currentActualYear} 跑步进度：`}
         displayPercent={Math.min(
           (currentYearDistance / PLAN_TOTAL_DISTANCE_OF_CURRENT_YEAR) * 100,
           100
@@ -127,7 +131,7 @@ const YearsStat = ({
         )}
       />
       <MetallicProgressBar
-        labelPrefix={`${thisYear} 时间进度：`}
+        labelPrefix={`${currentActualYear} 时间进度：`}
         displayPercent={yearProgress.percent}
         progressPercent={yearProgress.percent}
       />
