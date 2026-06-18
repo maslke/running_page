@@ -39,11 +39,8 @@ const Index = () => {
   const { siteTitle, siteUrl } = useSiteMetadata();
   const { activities, years, thisYear } = useActivities();
   const themeChangeCounter = useThemeChangeCounter();
-  const {
-    currentActualYear,
-    yearProgress,
-    runDistancePercent,
-  } = useCurrentYearStats();
+  const { currentActualYear, yearProgress, runDistancePercent } =
+    useCurrentYearStats();
   const [year, setYear] = useState(thisYear);
   const [runIndex, setRunIndex] = useState(-1);
   const [title, setTitle] = useState('');
@@ -476,7 +473,9 @@ const Index = () => {
         <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl">
           <a href={siteUrl}>{siteTitle}</a>
         </h1>
-        <p className="text-sm font-bold leading-relaxed opacity-70">{infoMessage}</p>
+        <p className="text-sm font-bold leading-relaxed opacity-70">
+          {infoMessage}
+        </p>
       </div>
 
       <Card className="p-5 lg:p-8">
@@ -484,18 +483,15 @@ const Index = () => {
           <Stat value={summaryStats.count || '/'} description="Runs" />
           <Stat value={summaryStats.km} description="KM" />
           <Stat value={summaryStats.avgPace} description="Avg Pace" />
-          <Stat value={summaryStats.streak ? `${summaryStats.streak}d` : '/'} description="Streak" />
+          <Stat
+            value={summaryStats.streak ? `${summaryStats.streak}d` : '/'}
+            description="Streak"
+          />
           {SHOW_ELEVATION_GAIN && (
-            <Stat
-              value={summaryStats.elevationGain}
-              description="Elevation"
-            />
+            <Stat value={summaryStats.elevationGain} description="Elevation" />
           )}
           {summaryStats.hasHeartRate && (
-            <Stat
-              value={summaryStats.avgHeartRate}
-              description="Avg BPM"
-            />
+            <Stat value={summaryStats.avgHeartRate} description="Avg BPM" />
           )}
         </div>
         <div className="mt-5 space-y-1.5">

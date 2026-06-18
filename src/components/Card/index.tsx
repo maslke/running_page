@@ -12,7 +12,7 @@ const Card = ({
 }: React.PropsWithChildren<CardProps>) => (
   <div
     id={id}
-    className={`rounded-xl bg-(--color-activity-card) p-5 ${className}`}
+    className={`bg-(--color-activity-card) rounded-xl p-5 ${className}`}
     style={{ boxShadow: '0 2px 8px var(--color-card-shadow)' }}
   >
     {children}

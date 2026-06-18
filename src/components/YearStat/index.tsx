@@ -120,9 +120,7 @@ const YearStat = ({
   return (
     <div
       className={`cursor-pointer overflow-hidden rounded-xl transition-all hover:opacity-85 ${
-        isActive
-          ? 'ring-1 ring-(--color-selected)/30'
-          : ''
+        isActive ? 'ring-(--color-selected)/30 ring-1' : ''
       }`}
       style={{
         backgroundColor: 'var(--color-run-row-hover-background)',
@@ -137,9 +135,13 @@ const YearStat = ({
             style={{ backgroundColor: 'var(--color-selected)' }}
           />
         )}
-        <div className={`flex-1 p-2.5 lg:p-3 ${isActive ? 'pl-2 lg:pl-2.5' : ''}`}>
+        <div
+          className={`flex-1 p-2.5 lg:p-3 ${isActive ? 'pl-2 lg:pl-2.5' : ''}`}
+        >
           <div className="flex items-baseline gap-3 lg:mb-1.5 lg:block">
-            <span className={`text-sm font-black uppercase tracking-tight lg:text-base ${isActive ? 'opacity-100' : 'opacity-75'}`}>
+            <span
+              className={`text-sm font-black uppercase tracking-tight lg:text-base ${isActive ? 'opacity-100' : 'opacity-75'}`}
+            >
               {year}
             </span>
             <div className="flex flex-1 gap-3 overflow-hidden lg:hidden">
@@ -165,7 +167,10 @@ const YearStat = ({
             {hasHeartRate && <CompactStat value={avgHeartRate} label="BPM" />}
           </div>
           {year !== 'Total' && hovered && (
-            <div className="mt-2.5 hidden lg:block" style={{ width: '100%', height: 170 }}>
+            <div
+              className="mt-2.5 hidden lg:block"
+              style={{ width: '100%', height: 170 }}
+            >
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart
                   data={monthlyData}

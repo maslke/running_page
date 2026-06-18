@@ -64,7 +64,7 @@ const Header = () => {
     <nav className="mx-auto mt-8 flex w-full max-w-screen-2xl items-center justify-between px-4 lg:px-12">
       <Link to={siteUrl} className="shrink-0">
         <img
-          className="h-12 w-12 rounded-full ring-2 ring-(--color-activity-card) transition-transform hover:scale-105"
+          className="ring-(--color-activity-card) h-12 w-12 rounded-full ring-2 transition-transform hover:scale-105"
           alt="logo"
           src={logo}
         />

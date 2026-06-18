@@ -70,7 +70,12 @@ export const useCurrentYearStats = () => {
     100
   );
 
-  return { currentActualYear, currentYearDistance, yearProgress, runDistancePercent };
+  return {
+    currentActualYear,
+    currentYearDistance,
+    yearProgress,
+    runDistancePercent,
+  };
 };
 
 const YearsStat = ({
