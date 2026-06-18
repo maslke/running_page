@@ -39,7 +39,6 @@ import {
 } from '@/utils/utils';
 import { RouteAnimator } from '@/utils/routeAnimation';
 import RunMarker from './RunMarker';
-import RunMapButtons from './RunMapButtons';
 import styles from './style.module.css';
 import { FeatureCollection } from 'geojson';
 import { RPGeometry } from '@/static/run_countries';
@@ -51,19 +50,15 @@ interface IRunMapProps {
   title: string;
   viewState: IViewState;
   setViewState: (_viewState: IViewState) => void;
-  changeYear: (_year: string) => void;
   geoData: FeatureCollection<RPGeometry>;
-  thisYear: string;
-  animationTrigger?: number; // Optional trigger to force animation replay
+  animationTrigger?: number;
 }
 
 const RunMap = ({
   title,
   viewState,
   setViewState,
-  changeYear,
   geoData,
-  thisYear,
   animationTrigger,
 }: IRunMapProps) => {
   const { countries, provinces } = useActivities();
@@ -372,7 +367,6 @@ const RunMap = ({
       cooperativeGestures={isTouchDevice()}
       mapboxAccessToken={MAPBOX_TOKEN}
     >
-      <RunMapButtons changeYear={changeYear} thisYear={thisYear} />
       <Source id="data" type="geojson" data={combinedGeoData}>
         <Layer
           id="province"

@@ -1,78 +1,40 @@
 .progressContainer {
-  position: relative;
-  margin-top: 0.75rem;
-  margin-bottom: 0.75rem;
-  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
 }
 
 .progressLabel {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  font-size: 0.7rem;
   color: var(--color-primary);
-  margin-bottom: 0.5rem;
+}
+
+.progressLabelText {
+  font-weight: 500;
+  opacity: 0.6;
 }
 
 .percentNumber {
-  font-size: 1.25em;
-  font-weight: 600;
+  font-size: 0.7rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
 }
 
-.percentSymbol {
-  font-size: 1em;
+.progressTrack {
+  width: 100%;
+  height: 6px;
+  border-radius: 9999px;
+  background-color: var(--color-run-row-hover-background);
+  overflow: hidden;
 }
 
-.progressBlocks {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-}
-
-.progressBlock {
-  height: 1rem;
-  flex: 1;
-  border-radius: 0.125rem;
-  transition:
-    transform 150ms,
-    background 0.1s ease,
-    box-shadow 0.1s ease,
-    border 0.1s ease;
-}
-
-.progressContainer:hover .progressBlock {
-  transform: scale(1.05);
-}
-
-.filledBlock {
-  background: var(--progress-filled-bg);
-  box-shadow: var(--progress-filled-shadow);
-  border: var(--progress-filled-border);
-}
-
-.partialBlock {
-  background: var(--progress-partial-bg);
-  box-shadow: var(--progress-partial-shadow);
-  border: var(--progress-partial-border);
-}
-
-.emptyBlock {
-  background: var(--progress-empty-bg);
-  box-shadow: var(--progress-empty-shadow);
-  border: var(--progress-empty-border);
-}
-
-.tooltip {
-  position: absolute;
-  left: 50%;
-  top: 100%;
-  z-index: 10;
-  margin-top: 0.25rem;
-  transform: translateX(-50%);
-  border-radius: 0.25rem;
-  padding: 0.25rem 0.5rem;
-  font-size: 0.75rem;
-  font-weight: 500;
-  box-shadow:
-    0 4px 6px -1px rgba(0, 0, 0, 0.1),
-    0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  background: var(--progress-tooltip-bg);
-  color: var(--progress-tooltip-color);
-  border: var(--progress-tooltip-border);
+.progressFill {
+  height: 100%;
+  border-radius: 9999px;
+  background-color: var(--color-selected);
+  opacity: 0.8;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
