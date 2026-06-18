@@ -14,18 +14,6 @@
     max-width: 100vw;
   }
 
-  /* Make main content areas mobile-friendly */
-  .lg\:w-1\/3,
-  .lg\:w-2\/3 {
-    width: 100% !important;
-    max-width: 100%;
-  }
-
-  /* Improve spacing on mobile */
-  .lg\:p-16 {
-    padding: 1rem !important;
-  }
-
   /* Reduce title size on mobile */
   .text-5xl {
     font-size: 2.5rem !important;

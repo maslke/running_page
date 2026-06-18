@@ -14,8 +14,8 @@ const Header = () => {
       id: 'dark',
       svg: (
         <svg
-          width="22"
-          height="23"
+          width="18"
+          height="18"
           viewBox="0 0 22 23"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
@@ -34,8 +34,8 @@ const Header = () => {
       id: 'light',
       svg: (
         <svg
-          width="24"
-          height="24"
+          width="18"
+          height="18"
           viewBox="0 0 24 24"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
@@ -61,39 +61,31 @@ const Header = () => {
   const currentIcon = icons[currentIconIndex];
 
   return (
-    <>
-      <nav className="mx-auto mt-12 flex w-full min-w-max max-w-screen-2xl items-center justify-between pl-6 lg:px-16">
-        <div className="w-1/4">
-          <Link to={siteUrl}>
-            <picture>
-              <img className="h-16 w-16 rounded-full" alt="logo" src={logo} />
-            </picture>
-          </Link>
-        </div>
-        <div className="flex w-3/4 items-center justify-end text-right">
-          {navLinks.map((n, i) => (
-            <a
-              key={i}
-              href={n.url}
-              className="mr-3 text-lg lg:mr-4 lg:text-base"
-            >
-              {n.name}
-            </a>
-          ))}
-          <div className="ml-4 flex items-center space-x-2">
-            <button
-              type="button"
-              onClick={handleToggle}
-              className={`${styles.themeButton} ${styles.themeButtonActive}`}
-              aria-label={`Switch to ${currentIcon.id} theme`}
-              title={`Switch to ${currentIcon.id} theme`}
-            >
-              <div className={styles.iconWrapper}>{currentIcon.svg}</div>
-            </button>
-          </div>
-        </div>
-      </nav>
-    </>
+    <nav className="mx-auto mt-8 flex w-full max-w-screen-2xl items-center justify-between px-4 lg:px-12">
+      <Link to={siteUrl} className="shrink-0">
+        <img
+          className="ring-(--color-activity-card) h-12 w-12 rounded-full ring-2 transition-transform hover:scale-105"
+          alt="logo"
+          src={logo}
+        />
+      </Link>
+      <div className="flex items-center gap-2">
+        {navLinks.map((n, i) => (
+          <a key={i} href={n.url} className={styles.navLink}>
+            {n.name}
+          </a>
+        ))}
+        <button
+          type="button"
+          onClick={handleToggle}
+          className={styles.themeButton}
+          aria-label={`Switch to ${currentIcon.id} theme`}
+          title={`Switch to ${currentIcon.id} theme`}
+        >
+          <div className={styles.iconWrapper}>{currentIcon.svg}</div>
+        </button>
+      </div>
+    </nav>
   );
 };
 

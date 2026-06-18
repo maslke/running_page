@@ -29,28 +29,50 @@
 
 .runTable {
   width: 100%;
-  margin: 2rem 0 5rem 0;
+  margin: 0;
   color: var(--color-run-table-thead);
-  background-color: var(--color-background);
   font-family: var(--font-mono);
+  font-size: 0.82rem;
   table-layout: auto;
+  border-collapse: separate;
+  border-spacing: 0 0.35rem;
+
   :is(thead) {
     color: var(--color-run-table-thead);
+    position: sticky;
+    top: 0;
+    z-index: 1;
 
     :is(th) {
-      padding: 0.5rem;
+      padding: 0.6rem 0.75rem;
       white-space: nowrap;
       text-align: center;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      opacity: 0.8;
+      background-color: var(--color-activity-card);
+      cursor: pointer;
+      user-select: none;
+      transition: opacity 0.15s ease;
+    }
+
+    :is(th):hover {
+      opacity: 1;
     }
 
     :is(th):first-child {
       text-align: left;
+      border-radius: 0.5rem 0 0 0.5rem;
     }
 
     :is(th):last-child {
       text-align: right;
+      border-radius: 0 0.5rem 0.5rem 0;
     }
   }
+
   :is(th, td) {
     white-space: nowrap;
     text-align: center;
@@ -67,36 +89,64 @@
 
 .runRow {
   cursor: pointer;
+  transition: all 0.15s ease;
+
   :is(td) {
-    padding: 0.5rem;
+    padding: 0.55rem 0.75rem;
     border: 0;
-    border-bottom: 1px solid
-      var(--color-run-table-border, rgba(128, 128, 128, 0.3));
-    text-align: center; /* 默认居中 */
+    background-color: var(--color-run-row-hover-background);
+    text-align: center;
+    font-variant-numeric: tabular-nums;
   }
 
   :is(td):first-child {
     text-align: left;
+    border-radius: 0.6rem 0 0 0.6rem;
   }
 
   :is(td):last-child {
     text-align: right;
+    border-radius: 0 0.6rem 0.6rem 0;
   }
 
   &:hover {
-    background-color: var(--color-run-row-hover-background);
+    transform: translateY(-1px);
+
+    :is(td) {
+      background-color: var(--color-activity-card);
+    }
   }
 }
 
 .selected {
+  transform: translateY(-1px);
+
+  :is(td) {
+    background-color: var(--color-activity-card);
+  }
+
+  :is(td):first-child {
+    border-radius: 0.6rem 0 0 0.6rem;
+    box-shadow: inset 3px 0 0 var(--color-selected);
+  }
+
+  :is(td):last-child {
+    border-radius: 0 0.6rem 0.6rem 0;
+  }
+
   color: var(--color-primary);
+  font-weight: 600;
 }
 
 .tableContainer {
   width: 100%;
+  max-height: 640px;
+  overflow-y: auto;
   overflow-x: auto;
 }
 
 .runDate {
   color: var(--color-run-date);
+  font-size: 0.8em;
+  opacity: 0.7;
 }

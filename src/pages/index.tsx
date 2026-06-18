@@ -2,15 +2,22 @@ import { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import { Analytics } from '@vercel/analytics/react';
 import { Helmet } from 'react-helmet-async';
 import Layout from '@/components/Layout';
+import Card from '@/components/Card';
+import YearPills from '@/components/YearPills';
 import LocationStat from '@/components/LocationStat';
 import RunMap from '@/components/RunMap';
 import RunTable from '@/components/RunTable';
 import SVGStat from '@/components/SVGStat';
 import YearsStat from '@/components/YearsStat';
+import {
+  MetallicProgressBar,
+  useCurrentYearStats,
+} from '@/components/YearsStat';
+import Stat from '@/components/Stat';
 import useActivities from '@/hooks/useActivities';
 import useSiteMetadata from '@/hooks/useSiteMetadata';
 import { useInterval } from '@/hooks/useInterval';
-import { IS_CHINESE } from '@/utils/const';
+import { IS_CHINESE, INFO_MESSAGE, SHOW_ELEVATION_GAIN } from '@/utils/const';
 import {
   Activity,
   IViewState,
@@ -18,6 +25,7 @@ import {
   filterCityRuns,
   filterTitleRuns,
   filterYearRuns,
+  formatPace,
   geoJsonForRuns,
   getBoundsForGeoData,
   scrollToMap,
@@ -29,8 +37,10 @@ import { useTheme, useThemeChangeCounter } from '@/hooks/useTheme';
 
 const Index = () => {
   const { siteTitle, siteUrl } = useSiteMetadata();
-  const { activities, thisYear } = useActivities();
+  const { activities, years, thisYear } = useActivities();
   const themeChangeCounter = useThemeChangeCounter();
+  const { currentActualYear, yearProgress, runDistancePercent } =
+    useCurrentYearStats();
   const [year, setYear] = useState(thisYear);
   const [runIndex, setRunIndex] = useState(-1);
   const [title, setTitle] = useState('');
@@ -388,47 +398,164 @@ const Index = () => {
 
   const { theme } = useTheme();
 
+  const summaryStats = useMemo(() => {
+    const targetRuns = activities.filter(
+      (run) => run.start_date_local.slice(0, 4) === currentActualYear
+    );
+
+    if (targetRuns.length === 0) {
+      return {
+        count: 0,
+        km: '/',
+        avgPace: '/',
+        streak: 0,
+        hasHeartRate: false,
+        avgHeartRate: '/',
+        elevationGain: '/',
+      };
+    }
+
+    let sumDistance = 0;
+    let sumElevationGain = 0;
+    let totalMetersAvail = 0;
+    let totalSecondsAvail = 0;
+    let heartRate = 0;
+    let heartRateNullCount = 0;
+    let streak = 0;
+
+    targetRuns.forEach((run) => {
+      sumDistance += run.distance || 0;
+      sumElevationGain += run.elevation_gain || 0;
+      if (run.average_speed) {
+        totalMetersAvail += run.distance || 0;
+        totalSecondsAvail += (run.distance || 0) / run.average_speed;
+      }
+      if (run.average_heartrate) {
+        heartRate += run.average_heartrate;
+      } else {
+        heartRateNullCount++;
+      }
+      if (run.streak) {
+        streak = Math.max(streak, run.streak);
+      }
+    });
+
+    const km = (sumDistance / 1000).toFixed(1);
+    const avgPace = formatPace(totalMetersAvail / totalSecondsAvail);
+    const hasHeartRate = heartRate > 0;
+    const avgHeartRate = hasHeartRate
+      ? (heartRate / (targetRuns.length - heartRateNullCount)).toFixed(0)
+      : '0';
+
+    return {
+      count: targetRuns.length,
+      km,
+      avgPace,
+      streak,
+      hasHeartRate,
+      avgHeartRate,
+      elevationGain: sumElevationGain.toFixed(0),
+    };
+  }, [activities, currentActualYear]);
+
+  const infoMessage = useMemo(() => {
+    return INFO_MESSAGE(years.length, year);
+  }, [years.length, year]);
+
   return (
     <Layout>
       <Helmet>
         <html lang="en" data-theme={theme} />
       </Helmet>
-      <div className="w-full lg:w-1/3">
-        <h1 className="my-12 mt-6 text-5xl font-extrabold italic">
+
+      {/* ===== 顶部区域（全宽） ===== */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl">
           <a href={siteUrl}>{siteTitle}</a>
         </h1>
-        {(viewState.zoom ?? 0) <= 3 && IS_CHINESE ? (
-          <LocationStat
-            changeYear={changeYear}
-            changeCity={changeCity}
-            changeTitle={changeTitle}
-          />
-        ) : (
-          <YearsStat year={year} onClick={changeYear} />
-        )}
+        <p className="text-sm font-bold leading-relaxed opacity-70">
+          {infoMessage}
+        </p>
       </div>
-      <div className="w-full lg:w-2/3" id="map-container">
-        <RunMap
-          title={title}
-          viewState={viewState}
-          geoData={animatedGeoData}
-          setViewState={setViewState}
-          changeYear={changeYear}
-          thisYear={year}
-          animationTrigger={animationTrigger}
-        />
-        {year === 'Total' ? (
-          <SVGStat />
-        ) : (
-          <RunTable
-            runs={runs}
-            locateActivity={locateActivity}
-            setActivity={setActivity}
-            runIndex={runIndex}
-            setRunIndex={setRunIndex}
+
+      <Card className="p-5 lg:p-8">
+        <div className="grid grid-cols-2 gap-x-6 gap-y-4 md:grid-cols-3 lg:grid-cols-6">
+          <Stat value={summaryStats.count || '/'} description="Runs" />
+          <Stat value={summaryStats.km} description="KM" />
+          <Stat value={summaryStats.avgPace} description="Avg Pace" />
+          <Stat
+            value={summaryStats.streak ? `${summaryStats.streak}d` : '/'}
+            description="Streak"
           />
-        )}
+          {SHOW_ELEVATION_GAIN && (
+            <Stat value={summaryStats.elevationGain} description="Elevation" />
+          )}
+          {summaryStats.hasHeartRate && (
+            <Stat value={summaryStats.avgHeartRate} description="Avg BPM" />
+          )}
+        </div>
+        <div className="mt-5 space-y-1.5">
+          <MetallicProgressBar
+            labelPrefix={`${currentActualYear} 跑步进度：`}
+            displayPercent={runDistancePercent}
+            progressPercent={runDistancePercent}
+          />
+          <MetallicProgressBar
+            labelPrefix={`${currentActualYear} 时间进度：`}
+            displayPercent={yearProgress.percent}
+            progressPercent={yearProgress.percent}
+          />
+        </div>
+      </Card>
+
+      {/* ===== 主体区域（左右分栏） ===== */}
+      <div className="flex flex-col gap-6 lg:flex-row">
+        {/* 左侧边栏 */}
+        <div className="flex w-full flex-col gap-4 lg:w-1/3">
+          {(viewState.zoom ?? 0) <= 3 && IS_CHINESE ? (
+            <Card className="p-4">
+              <LocationStat
+                changeYear={changeYear}
+                changeCity={changeCity}
+                changeTitle={changeTitle}
+              />
+            </Card>
+          ) : (
+            <Card className="p-3 lg:p-4">
+              <YearsStat year={year} onClick={changeYear} />
+            </Card>
+          )}
+        </div>
+
+        {/* 右侧主内容 */}
+        <div className="flex w-full flex-col gap-4 lg:w-2/3">
+          <YearPills years={years} selectedYear={year} onClick={changeYear} />
+          <Card className="overflow-hidden p-0" id="map-container">
+            <RunMap
+              title={title}
+              viewState={viewState}
+              geoData={animatedGeoData}
+              setViewState={setViewState}
+              animationTrigger={animationTrigger}
+            />
+          </Card>
+
+          <Card className="p-4">
+            {year === 'Total' ? (
+              <SVGStat />
+            ) : (
+              <RunTable
+                runs={runs}
+                locateActivity={locateActivity}
+                setActivity={setActivity}
+                runIndex={runIndex}
+                setRunIndex={setRunIndex}
+              />
+            )}
+          </Card>
+        </div>
       </div>
+
       {/* Enable Audiences in Vercel Analytics: https://vercel.com/docs/concepts/analytics/audiences/quickstart */}
       {import.meta.env.VERCEL && <Analytics />}
     </Layout>

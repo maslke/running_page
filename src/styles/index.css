@@ -39,6 +39,7 @@
     --color-run-table-thead: var(--color-neutral-800);
     --color-run-row-hover-background: var(--color-neutral-200);
     --color-activity-card: var(--color-neutral-300);
+    --color-card-shadow: rgba(0, 0, 0, 0.08);
     --svg-color-active-cell: var(--color-neutral-400);
     --svg-special-color: #d4a574;
     --svg-special-color2: #c5756b;
@@ -60,6 +61,7 @@
     --color-run-table-thead: var(--color-zinc-300);
     --color-run-row-hover-background: var(--color-neutral-800);
     --color-activity-card: var(--color-neutral-700);
+    --color-card-shadow: rgba(0, 0, 0, 0.3);
     --svg-color-active-cell: #4dd2ff;
     --svg-special-color: #f7d02c;
     --svg-special-color2: #f56c6c;
@@ -80,46 +82,13 @@
   --color-run-table-thead: var(--color-neutral-800);
   --color-run-row-hover-background: var(--color-neutral-200);
   --color-activity-card: var(--color-neutral-300);
+  --color-card-shadow: rgba(0, 0, 0, 0.08);
   --svg-color-inactive-cell: var(--color-neutral-600);
   --svg-color-active-cell: var(--color-neutral-400);
   --svg-special-color: #d4a574;
   --svg-special-color2: #c5756b;
   --font-sans: 'IBM Plex Sans', sans-serif;
   --font-mono: 'IBM Plex Mono', monospace;
-  /* progress bar */
-  --progress-filled-bg: linear-gradient(
-    180deg,
-    #7dd3a8 0%,
-    #4caf7d 30%,
-    #3d9d6a 70%,
-    #2d8a5a 100%
-  );
-  --progress-filled-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.2), 0 1px 3px rgba(0, 0, 0, 0.15);
-  --progress-filled-border: 1px solid rgba(0, 0, 0, 0.15);
-  --progress-partial-bg: linear-gradient(
-    180deg,
-    #ffd700 0%,
-    #ffb347 30%,
-    #ff9500 70%,
-    #e68a00 100%
-  );
-  --progress-partial-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.15);
-  --progress-partial-border: 1px solid rgba(0, 0, 0, 0.15);
-  --progress-empty-bg: linear-gradient(
-    180deg,
-    #e8e8e8 0%,
-    #d4d4d4 30%,
-    #c0c0c0 70%,
-    #a8a8a8 100%
-  );
-  --progress-empty-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.1);
-  --progress-empty-border: 1px solid rgba(0, 0, 0, 0.1);
-  --progress-tooltip-bg: rgba(255, 255, 255, 0.95);
-  --progress-tooltip-color: #333;
-  --progress-tooltip-border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 [data-theme='dark'] {
@@ -134,45 +103,12 @@
   --color-run-table-thead: var(--color-zinc-300);
   --color-run-row-hover-background: var(--color-neutral-800);
   --color-activity-card: var(--color-neutral-700);
+  --color-card-shadow: rgba(0, 0, 0, 0.3);
   --svg-color-active-cell: #4dd2ff;
   --svg-special-color: #f7d02c;
   --svg-special-color2: #f56c6c;
   --font-sans: 'IBM Plex Sans', sans-serif;
   --font-mono: 'IBM Plex Mono', monospace;
-  /* progress bar */
-  --progress-filled-bg: linear-gradient(
-    180deg,
-    #a8e6cf 0%,
-    #56ab91 30%,
-    #3d8b6e 70%,
-    #2d6a4f 100%
-  );
-  --progress-filled-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
-  --progress-filled-border: 1px solid rgba(0, 0, 0, 0.3);
-  --progress-partial-bg: linear-gradient(
-    180deg,
-    #ffe066 0%,
-    #ffc940 30%,
-    #faad14 70%,
-    #d99a00 100%
-  );
-  --progress-partial-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.25), 0 1px 2px rgba(0, 0, 0, 0.2);
-  --progress-partial-border: 1px solid rgba(0, 0, 0, 0.25);
-  --progress-empty-bg: linear-gradient(
-    180deg,
-    #4a4a4a 0%,
-    #3d3d3d 30%,
-    #2d2d2d 70%,
-    #1a1a1a 100%
-  );
-  --progress-empty-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
-  --progress-empty-border: 1px solid rgba(0, 0, 0, 0.3);
-  --progress-tooltip-bg: rgba(0, 0, 0, 0.85);
-  --progress-tooltip-color: #fff;
-  --progress-tooltip-border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 @layer base {

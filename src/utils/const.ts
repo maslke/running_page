@@ -38,7 +38,7 @@ const USE_DASH_LINE = true;
 const LINE_OPACITY = 0.4;
 // styling: map height - responsive design
 // Use smaller height on mobile devices for better user experience
-const MAP_HEIGHT = window.innerWidth <= 768 ? 250 : 600;
+const MAP_HEIGHT = window.innerWidth <= 768 ? 250 : 420;
 //set to `false` if you want to hide the road label characters
 const ROAD_LABEL_DISPLAY = true;
 // updated on 2024/11/17: privacy mode is set to true by default
@@ -169,7 +169,7 @@ export {
   PLAN_TOTAL_DISTANCE_OF_CURRENT_YEAR,
 };
 
-const nike = 'rgb(224,237,94)'; // if you want to change the main color, modify this value in src/styles/variables.scss
+const nike = 'rgb(224,237,94)';
 const dark_vanilla = 'rgb(228,212,220)';
 
 // If your map has an offset please change this line

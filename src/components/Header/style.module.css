@@ -1,21 +1,36 @@
+.navLink {
+  position: relative;
+  padding: 0.35rem 0.8rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-radius: 9999px;
+  background-color: var(--color-activity-card);
+  transition: all 0.2s ease;
+}
+
+.navLink:hover {
+  opacity: 0.8;
+  transform: translateY(-1px);
+}
+
 .themeButton {
   border-radius: 50%;
   transition: all 0.2s ease;
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
   position: relative;
+  background-color: var(--color-activity-card);
 }
 
 .themeButton:hover {
-  background-color: var(--color-run-row-hover-background);
-}
-
-.themeButtonActive {
-  background-color: var(--color-run-row-hover-background);
+  opacity: 0.8;
+  transform: translateY(-1px);
 }
 
 .iconWrapper {

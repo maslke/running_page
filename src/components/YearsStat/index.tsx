@@ -1,15 +1,10 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import YearStat from '@/components/YearStat';
 import useActivities from '@/hooks/useActivities';
-import {
-  INFO_MESSAGE,
-  PLAN_TOTAL_DISTANCE_OF_CURRENT_YEAR,
-} from '@/utils/const';
+import { PLAN_TOTAL_DISTANCE_OF_CURRENT_YEAR } from '@/utils/const';
 import styles from './style.module.css';
 
-const TOTAL_BLOCKS = 50;
-
-const MetallicProgressBar = ({
+export const MetallicProgressBar = ({
   labelPrefix,
   displayPercent,
   progressPercent,
@@ -18,49 +13,27 @@ const MetallicProgressBar = ({
   displayPercent: number;
   progressPercent: number;
 }) => {
-  const [isHovered, setIsHovered] = useState(false);
-
-  const percentPerBlock = 100 / TOTAL_BLOCKS;
-  const filledBlocks = Math.floor(progressPercent / percentPerBlock);
-  const remainder = progressPercent % percentPerBlock;
-  const hasPartialBlock = remainder >= 1 && filledBlocks < TOTAL_BLOCKS;
-
-  const getBlockClassName = (index: number) => {
-    if (index < filledBlocks) {
-      return `${styles.progressBlock} ${styles.filledBlock}`;
-    }
-    if (index === filledBlocks && hasPartialBlock) {
-      return `${styles.progressBlock} ${styles.partialBlock}`;
-    }
-    return `${styles.progressBlock} ${styles.emptyBlock}`;
-  };
+  const clampedPercent = Math.min(Math.max(progressPercent, 0), 100);
 
   return (
-    <div
-      className={styles.progressContainer}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
+    <div className={styles.progressContainer}>
       <div className={styles.progressLabel}>
-        {labelPrefix}
+        <span className={styles.progressLabelText}>{labelPrefix}</span>
         <span className={styles.percentNumber}>
-          {displayPercent.toFixed(1)}
-        </span>{' '}
-        <span className={styles.percentSymbol}>%</span>
+          {displayPercent.toFixed(1)}%
+        </span>
       </div>
-      <div className={styles.progressBlocks}>
-        {Array.from({ length: TOTAL_BLOCKS }).map((_, index) => (
-          <div key={index} className={getBlockClassName(index)} />
-        ))}
+      <div className={styles.progressTrack}>
+        <div
+          className={styles.progressFill}
+          style={{ width: `${clampedPercent}%` }}
+        />
       </div>
-      {isHovered && (
-        <div className={styles.tooltip}>{progressPercent.toFixed(1)}%</div>
-      )}
     </div>
   );
 };
 
-const getYearProgress = () => {
+export const getYearProgress = () => {
   const now = new Date();
   const startOfYear = new Date(now.getFullYear(), 0, 1);
   const endOfYear = new Date(now.getFullYear() + 1, 0, 1);
@@ -72,26 +45,8 @@ const getYearProgress = () => {
   return { percent, elapsedDays, totalDays };
 };
 
-const YearsStat = ({
-  year,
-  onClick,
-}: {
-  year: string;
-  onClick: (_year: string) => void;
-}) => {
-  const { years, thisYear, activities } = useActivities();
-
-  const yearsArrayUpdate = useMemo(() => {
-    let updatedYears = years.slice();
-    updatedYears.push('Total');
-    updatedYears = updatedYears.filter((x) => x !== year);
-    updatedYears.unshift(year);
-    return updatedYears;
-  }, [years, year]);
-
-  const infoMessage = useMemo(() => {
-    return INFO_MESSAGE(years.length, year);
-  }, [years.length, year]);
+export const useCurrentYearStats = () => {
+  const { activities } = useActivities();
 
   const currentActualYear = useMemo(() => {
     return new Date().getFullYear().toString();
@@ -110,36 +65,45 @@ const YearsStat = ({
 
   const yearProgress = useMemo(() => getYearProgress(), []);
 
+  const runDistancePercent = Math.min(
+    (currentYearDistance / PLAN_TOTAL_DISTANCE_OF_CURRENT_YEAR) * 100,
+    100
+  );
+
+  return {
+    currentActualYear,
+    currentYearDistance,
+    yearProgress,
+    runDistancePercent,
+  };
+};
+
+const YearsStat = ({
+  year,
+  onClick,
+}: {
+  year: string;
+  onClick: (_year: string) => void;
+}) => {
+  const { years } = useActivities();
+
+  const yearsArrayUpdate = useMemo(() => {
+    let updatedYears = years.slice();
+    updatedYears.push('Total');
+    updatedYears = updatedYears.filter((x) => x !== year);
+    updatedYears.unshift(year);
+    return updatedYears;
+  }, [years, year]);
+
   return (
-    <div className="w-full pb-16 pr-16 lg:w-full lg:pr-16">
-      <section className="pb-0">
-        <p className="leading-relaxed">
-          {infoMessage}
-          <br />
-        </p>
-      </section>
-      <hr />
-      <MetallicProgressBar
-        labelPrefix={`${currentActualYear} 跑步进度：`}
-        displayPercent={Math.min(
-          (currentYearDistance / PLAN_TOTAL_DISTANCE_OF_CURRENT_YEAR) * 100,
-          100
-        )}
-        progressPercent={Math.min(
-          (currentYearDistance / PLAN_TOTAL_DISTANCE_OF_CURRENT_YEAR) * 100,
-          100
-        )}
-      />
-      <MetallicProgressBar
-        labelPrefix={`${currentActualYear} 时间进度：`}
-        displayPercent={yearProgress.percent}
-        progressPercent={yearProgress.percent}
-      />
+    <div className="flex w-full flex-col gap-2.5">
       {yearsArrayUpdate.map((yearItem) => (
-        <div key={yearItem}>
-          <hr />
-          <YearStat year={yearItem} onClick={onClick} />
-        </div>
+        <YearStat
+          key={yearItem}
+          year={yearItem}
+          isActive={yearItem === year}
+          onClick={onClick}
+        />
       ))}
     </div>
   );
