@@ -1,0 +1,139 @@
+.heatmapWrapper {
+  --heatmap-empty: var(--color-run-row-hover-background);
+  --heatmap-level-1: color-mix(
+    in srgb,
+    var(--color-primary) 25%,
+    var(--color-activity-card)
+  );
+  --heatmap-level-2: color-mix(
+    in srgb,
+    var(--color-primary) 50%,
+    var(--color-activity-card)
+  );
+  --heatmap-level-3: color-mix(
+    in srgb,
+    var(--color-primary) 75%,
+    var(--color-activity-card)
+  );
+  --heatmap-level-4: var(--color-primary);
+
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.yearSection {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.yearHeader {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.yearLabel {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.yearDistance {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--color-run-table-thead);
+}
+
+.heatmapScroll {
+  overflow: hidden;
+}
+
+.heatmap {
+  display: flex;
+  gap: 4px;
+  min-width: max-content;
+}
+
+.dayLabels {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding-top: 22px;
+}
+
+.dayLabel {
+  height: 14px;
+  font-size: 10px;
+  line-height: 14px;
+  color: var(--color-run-table-thead);
+  text-align: right;
+  padding-right: 6px;
+}
+
+.gridArea {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.monthLabels {
+  display: grid;
+  grid-auto-columns: 17px;
+  height: 18px;
+}
+
+.monthLabel {
+  font-size: 10px;
+  line-height: 18px;
+  color: var(--color-run-table-thead);
+  white-space: nowrap;
+}
+
+.grid {
+  display: flex;
+  gap: 3px;
+}
+
+.weekColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.cell {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  transition: outline 0.1s ease;
+}
+
+.cellActive {
+  cursor: pointer;
+}
+
+.cellActive:hover {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 1px;
+}
+
+.legend {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  padding-top: 4px;
+}
+
+.legendText {
+  font-size: 10px;
+  color: var(--color-run-table-thead);
+  padding: 0 3px;
+}
+
+.legendCell {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+}

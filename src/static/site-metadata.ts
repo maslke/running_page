@@ -21,6 +21,10 @@ const data: ISiteMetadataResult = {
   description: 'Personal site and blog',
   navLinks: [
     {
+      name: 'Home',
+      url: `${getBasePath()}/`,
+    },
+    {
       name: 'Summary',
       url: `${getBasePath()}/summary`,
     },
