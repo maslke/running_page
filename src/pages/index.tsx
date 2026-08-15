@@ -7,7 +7,7 @@ import YearPills from '@/components/YearPills';
 import LocationStat from '@/components/LocationStat';
 import RunMap from '@/components/RunMap';
 import RunTable from '@/components/RunTable';
-import SVGStat from '@/components/SVGStat';
+import TrackGrid from '@/components/TrackGrid';
 import YearsStat from '@/components/YearsStat';
 import ActivityHeatmap from '@/components/ActivityHeatmap';
 import {
@@ -56,6 +56,8 @@ const Index = () => {
 
   // State to track if we're showing a single run from URL hash
   const [singleRunId, setSingleRunId] = useState<number | null>(null);
+
+  const [selectedTrackId, setSelectedTrackId] = useState<number | null>(null);
 
   // Animation trigger for single runs - increment this to force animation replay
   const [animationTrigger, setAnimationTrigger] = useState(0);
@@ -182,7 +184,6 @@ const Index = () => {
 
   const changeYear = useCallback(
     (y: string) => {
-      // default year
       setYear(y);
 
       if ((viewState.zoom ?? 0) > 3 && bounds) {
@@ -192,8 +193,8 @@ const Index = () => {
       }
 
       changeByItem(y, 'Year', filterYearRuns);
-      // Stop current animation
       setIsAnimating(false);
+      setSelectedTrackId(null);
     },
     [viewState.zoom, bounds, changeByItem]
   );
@@ -285,6 +286,34 @@ const Index = () => {
       scrollToMap();
     },
     [runs]
+  );
+
+  const toggleTrackOnMap = useCallback(
+    (runIds: number[]) => {
+      if (runIds.length !== 1) return;
+      const runId = runIds[0];
+
+      if (selectedTrackId === runId) {
+        setSelectedTrackId(null);
+        setAnimatedGeoData(geoData);
+        setViewState({ ...bounds });
+        setTitle('');
+      } else {
+        setSelectedTrackId(runId);
+        const targetRun = activities.find((r) => r.run_id === runId);
+        if (!targetRun) return;
+
+        const selectedGeoData = geoJsonForRuns([targetRun]);
+        const selectedBounds = getBoundsForGeoData(selectedGeoData);
+        setIsAnimating(false);
+        setAnimatedGeoData(selectedGeoData);
+        setAnimationTrigger((prev) => prev + 1);
+        setViewState({ ...selectedBounds });
+        setTitle(titleForShow(targetRun));
+        scrollToMap();
+      }
+    },
+    [selectedTrackId, activities, geoData, bounds]
   );
 
   // Auto locate activity when singleRunId is set and activities are loaded
@@ -490,7 +519,11 @@ const Index = () => {
 
           <Card className="p-4">
             {year === 'Total' ? (
-              <SVGStat />
+              <TrackGrid
+                activities={activities}
+                onTrackClick={toggleTrackOnMap}
+                selectedRunId={selectedTrackId}
+              />
             ) : (
               <RunTable
                 runs={runs}
