@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, useCallback, useRef } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import { Analytics } from '@vercel/analytics/react';
 import { Helmet } from 'react-helmet-async';
 import Layout from '@/components/Layout';
@@ -9,6 +9,7 @@ import RunMap from '@/components/RunMap';
 import RunTable from '@/components/RunTable';
 import SVGStat from '@/components/SVGStat';
 import YearsStat from '@/components/YearsStat';
+import ActivityHeatmap from '@/components/ActivityHeatmap';
 import {
   MetallicProgressBar,
   useCurrentYearStats,
@@ -58,9 +59,6 @@ const Index = () => {
 
   // Animation trigger for single runs - increment this to force animation replay
   const [animationTrigger, setAnimationTrigger] = useState(0);
-
-  const selectedRunIdRef = useRef<number | null>(null);
-  const selectedRunDateRef = useRef<string | null>(null);
 
   // Parse URL hash on mount to check for run ID
   useEffect(() => {
@@ -337,65 +335,6 @@ const Index = () => {
     }
   }, [runs, startAnimation, singleRunId]);
 
-  useEffect(() => {
-    if (year !== 'Total') {
-      return;
-    }
-
-    let svgStat = document.getElementById('svgStat');
-    if (!svgStat) {
-      return;
-    }
-
-    const handleClick = (e: Event) => {
-      const target = e.target as HTMLElement;
-      if (target.tagName.toLowerCase() === 'path') {
-        // Use querySelector to get the <desc> element and the <title> element.
-        const descEl = target.querySelector('desc');
-        if (descEl) {
-          // If the runId exists in the <desc> element, it means that a running route has been clicked.
-          const runId = Number(descEl.innerHTML);
-          if (!runId) {
-            return;
-          }
-          if (selectedRunIdRef.current === runId) {
-            selectedRunIdRef.current = null;
-            locateActivity(runs.map((r) => r.run_id));
-          } else {
-            selectedRunIdRef.current = runId;
-            locateActivity([runId]);
-          }
-          return;
-        }
-
-        const titleEl = target.querySelector('title');
-        if (titleEl) {
-          // If the runDate exists in the <title> element, it means that a date square has been clicked.
-          const [runDate] = titleEl.innerHTML.match(
-            /\d{4}-\d{1,2}-\d{1,2}/
-          ) || [`${+thisYear + 1}`];
-          const runIDsOnDate = runs
-            .filter((r) => r.start_date_local.slice(0, 10) === runDate)
-            .map((r) => r.run_id);
-          if (!runIDsOnDate.length) {
-            return;
-          }
-          if (selectedRunDateRef.current === runDate) {
-            selectedRunDateRef.current = null;
-            locateActivity(runs.map((r) => r.run_id));
-          } else {
-            selectedRunDateRef.current = runDate;
-            locateActivity(runIDsOnDate);
-          }
-        }
-      }
-    };
-    svgStat.addEventListener('click', handleClick);
-    return () => {
-      svgStat && svgStat.removeEventListener('click', handleClick);
-    };
-  }, [year]);
-
   const { theme } = useTheme();
 
   const summaryStats = useMemo(() => {
@@ -530,6 +469,15 @@ const Index = () => {
         {/* 右侧主内容 */}
         <div className="flex w-full flex-col gap-4 lg:w-2/3">
           <YearPills years={years} selectedYear={year} onClick={changeYear} />
+          {year !== 'Total' && (
+            <Card className="p-4 lg:p-6">
+              <ActivityHeatmap
+                year={year}
+                activities={activities}
+                onDayClick={locateActivity}
+              />
+            </Card>
+          )}
           <Card className="overflow-hidden p-0" id="map-container">
             <RunMap
               title={title}

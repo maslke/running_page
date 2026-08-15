@@ -17,15 +17,15 @@ import {
   CartesianGrid,
 } from 'recharts';
 import VirtualList from 'rc-virtual-list';
-import { useNavigate } from 'react-router-dom';
 import activities from '@/static/activities.json';
 import styles from './style.module.css';
 import { ACTIVITY_TOTAL, LOADING_TEXT } from '@/utils/const';
 import { totalStat, yearSummaryStats } from '@assets/index';
 import { loadSvgComponent } from '@/utils/svgUtils';
-import { SHOW_ELEVATION_GAIN, HOME_PAGE_TITLE } from '@/utils/const';
+import { SHOW_ELEVATION_GAIN } from '@/utils/const';
 import RoutePreview from '@/components/RoutePreview';
 import ExportButton from '@/components/ExportButton';
+import Card from '@/components/Card';
 import { Activity } from '@/utils/utils';
 // Layout constants (avoid magic numbers)
 const ITEM_WIDTH = 280;
@@ -437,12 +437,6 @@ const ActivityList: React.FC = () => {
     }
   }, [interval, sportType]);
 
-  const navigate = useNavigate();
-
-  const handleHomeClick = () => {
-    navigate('/');
-  };
-
   function toggleInterval(newInterval: IntervalType): void {
     setInterval(newInterval);
   }
@@ -768,276 +762,274 @@ const ActivityList: React.FC = () => {
 
   return (
     <div className={styles.activityList}>
-      <div className={styles.filterContainer} ref={filterRef}>
-        <button className={styles.smallHomeButton} onClick={handleHomeClick}>
-          {HOME_PAGE_TITLE}
-        </button>
-        <select
-          onChange={(e) => setSportType(e.target.value)}
-          value={sportType}
-        >
-          {sportTypeOptions.map((type) => (
-            <option
-              key={type}
-              value={type}
-              disabled={interval === 'life' && type !== 'all'}
-            >
-              {type}
-            </option>
-          ))}
-        </select>
-        <select
-          onChange={(e) => toggleInterval(e.target.value as IntervalType)}
-          value={interval}
-        >
-          <option value="year">{ACTIVITY_TOTAL.YEARLY_TITLE}</option>
-          <option value="month">{ACTIVITY_TOTAL.MONTHLY_TITLE}</option>
-          <option value="week">{ACTIVITY_TOTAL.WEEKLY_TITLE}</option>
-          <option value="day">{ACTIVITY_TOTAL.DAILY_TITLE}</option>
-          <option value="life">Life</option>
-        </select>
-        {interval === 'year' && (
-          <button
-            className={styles.exportAllButton}
-            onClick={handleExportAll}
-            disabled={isExportingAll || dataList.length === 0}
-            title="导出所有卡片为图片"
+      <Card className="p-4 lg:p-6">
+        <div className={styles.filterContainer} ref={filterRef}>
+          <select
+            onChange={(e) => setSportType(e.target.value)}
+            value={sportType}
           >
-            {isExportingAll ? (
-              <span className={styles.exportAllSpinner} />
-            ) : (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
+            {sportTypeOptions.map((type) => (
+              <option
+                key={type}
+                value={type}
+                disabled={interval === 'life' && type !== 'all'}
               >
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                <polyline points="7 10 12 15 17 10" />
-                <line x1="12" y1="15" x2="12" y2="3" />
-              </svg>
-            )}
-          </button>
-        )}
-      </div>
+                {type}
+              </option>
+            ))}
+          </select>
+          <select
+            onChange={(e) => toggleInterval(e.target.value as IntervalType)}
+            value={interval}
+          >
+            <option value="year">{ACTIVITY_TOTAL.YEARLY_TITLE}</option>
+            <option value="month">{ACTIVITY_TOTAL.MONTHLY_TITLE}</option>
+            <option value="week">{ACTIVITY_TOTAL.WEEKLY_TITLE}</option>
+            <option value="day">{ACTIVITY_TOTAL.DAILY_TITLE}</option>
+            <option value="life">Life</option>
+          </select>
+          {interval === 'year' && (
+            <button
+              className={styles.exportAllButton}
+              onClick={handleExportAll}
+              disabled={isExportingAll || dataList.length === 0}
+              title="导出所有卡片为图片"
+            >
+              {isExportingAll ? (
+                <span className={styles.exportAllSpinner} />
+              ) : (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+              )}
+            </button>
+          )}
+        </div>
+      </Card>
 
       {interval === 'life' && (
-        <div className={styles.lifeContainer}>
-          {/* Year selector buttons */}
-          <div className={styles.yearSelector}>
-            {availableYears.map((year) => (
-              <button
-                key={year}
-                className={`${styles.yearButton} ${selectedYear === year ? styles.yearButtonActive : ''}`}
-                onClick={() =>
-                  setSelectedYear(selectedYear === year ? null : year)
-                }
-              >
-                {year}
-              </button>
-            ))}
+        <Card className="p-4 lg:p-6">
+          <div className={styles.lifeContainer}>
+            <div className={styles.yearSelector}>
+              {availableYears.map((year) => (
+                <button
+                  key={year}
+                  className={`${styles.yearButton} ${selectedYear === year ? styles.yearButtonActive : ''}`}
+                  onClick={() =>
+                    setSelectedYear(selectedYear === year ? null : year)
+                  }
+                >
+                  {year}
+                </button>
+              ))}
+            </div>
+            <Suspense fallback={<div>Loading SVG...</div>}>
+              {selectedYear ? (
+                (() => {
+                  const YearSvg = getYearSummarySvg(selectedYear);
+                  return <YearSvg className={styles.yearSummarySvg} />;
+                })()
+              ) : (
+                <>
+                  {(sportType === 'running' || sportType === 'Run') && (
+                    <RunningSvg />
+                  )}
+                  {sportType === 'walking' && <WalkingSvg />}
+                  {sportType === 'hiking' && <HikingSvg />}
+                  {sportType === 'cycling' && <CyclingSvg />}
+                  {sportType === 'swimming' && <SwimmingSvg />}
+                  {sportType === 'skiing' && <SkiingSvg />}
+                  {sportType === 'all' && <AllSvg />}
+                </>
+              )}
+            </Suspense>
           </div>
-          <Suspense fallback={<div>Loading SVG...</div>}>
-            {selectedYear ? (
-              // Show Year Summary SVG when a year is selected
-              (() => {
-                const YearSvg = getYearSummarySvg(selectedYear);
-                return <YearSvg className={styles.yearSummarySvg} />;
-              })()
-            ) : (
-              // Show Life SVG when no year is selected
-              <>
-                {(sportType === 'running' || sportType === 'Run') && (
-                  <RunningSvg />
-                )}
-                {sportType === 'walking' && <WalkingSvg />}
-                {sportType === 'hiking' && <HikingSvg />}
-                {sportType === 'cycling' && <CyclingSvg />}
-                {sportType === 'swimming' && <SwimmingSvg />}
-                {sportType === 'skiing' && <SkiingSvg />}
-                {sportType === 'all' && <AllSvg />}
-              </>
-            )}
-          </Suspense>
-        </div>
+        </Card>
       )}
 
       {interval !== 'life' && (
-        <div className={styles.summaryContainer} ref={containerRef}>
-          {/* hidden sample card for measuring row height */}
-          <div
-            style={{
-              position: 'absolute',
-              visibility: 'hidden',
-              pointerEvents: 'none',
-              height: 'auto',
-            }}
-            ref={sampleRef}
-          >
-            {dataList[0] && (
-              <ActivityCard
-                key={dataList[0].period}
-                period={dataList[0].period}
-                summary={{
-                  totalDistance: dataList[0].summary.totalDistance,
-                  averageSpeed: dataList[0].summary.totalTime
-                    ? dataList[0].summary.totalDistance /
-                      (dataList[0].summary.totalTime / 3600)
-                    : 0,
-                  totalTime: dataList[0].summary.totalTime,
-                  count: dataList[0].summary.count,
-                  maxDistance: dataList[0].summary.maxDistance,
-                  maxSpeed: dataList[0].summary.maxSpeed,
-                  location: dataList[0].summary.location,
-                  totalElevationGain: SHOW_ELEVATION_GAIN
-                    ? dataList[0].summary.totalElevationGain
-                    : undefined,
-                  averageHeartRate:
-                    dataList[0].summary.heartRateCount > 0
-                      ? dataList[0].summary.totalHeartRate /
-                        dataList[0].summary.heartRateCount
+        <Card className="overflow-hidden p-0">
+          <div className={styles.summaryContainer} ref={containerRef}>
+            <div
+              style={{
+                position: 'absolute',
+                visibility: 'hidden',
+                pointerEvents: 'none',
+                height: 'auto',
+              }}
+              ref={sampleRef}
+            >
+              {dataList[0] && (
+                <ActivityCard
+                  key={dataList[0].period}
+                  period={dataList[0].period}
+                  summary={{
+                    totalDistance: dataList[0].summary.totalDistance,
+                    averageSpeed: dataList[0].summary.totalTime
+                      ? dataList[0].summary.totalDistance /
+                        (dataList[0].summary.totalTime / 3600)
+                      : 0,
+                    totalTime: dataList[0].summary.totalTime,
+                    count: dataList[0].summary.count,
+                    maxDistance: dataList[0].summary.maxDistance,
+                    maxSpeed: dataList[0].summary.maxSpeed,
+                    location: dataList[0].summary.location,
+                    totalElevationGain: SHOW_ELEVATION_GAIN
+                      ? dataList[0].summary.totalElevationGain
                       : undefined,
-                }}
-                dailyDistances={dataList[0].summary.dailyDistances}
-                interval={interval}
-                activities={
-                  interval === 'day'
-                    ? dataList[0].summary.activities
-                    : undefined
-                }
-              />
-            )}
-          </div>
-          <div className={styles.summaryInner}>
-            <div style={{ width: rowWidth }}>
-              {loading ? (
-                // Use full viewport height (or viewport minus filter height if available) to avoid flicker
-                <div
-                  style={{
-                    height: filterRef.current
-                      ? `${Math.max(100, window.innerHeight - (filterRef.current.clientHeight || 0) - 40)}px`
-                      : '100vh',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
+                    averageHeartRate:
+                      dataList[0].summary.heartRateCount > 0
+                        ? dataList[0].summary.totalHeartRate /
+                          dataList[0].summary.heartRateCount
+                        : undefined,
                   }}
-                >
-                  <div
-                    style={{
-                      padding: 20,
-                      color: 'var(--color-run-table-thead)',
-                    }}
-                  >
-                    {LOADING_TEXT}
-                  </div>
-                </div>
-              ) : (
-                <VirtualList
-                  key={`${sportType}-${interval}-${itemsPerRow}`}
-                  data={calcGroup}
-                  height={listHeight}
-                  itemHeight={rowHeight}
-                  itemKey={(row: RowGroup) => row[0]?.period ?? ''}
-                  styles={VIRTUAL_LIST_STYLES}
-                >
-                  {(row: RowGroup) => (
-                    <div
-                      ref={virtualListRef}
-                      className={styles.rowContainer}
-                      style={{ gap: `${gap}px` }}
-                    >
-                      {row.map(
-                        (cardData: {
-                          period: string;
-                          summary: ActivitySummary;
-                        }) => (
-                          <ActivityCard
-                            key={cardData.period}
-                            period={cardData.period}
-                            summary={{
-                              totalDistance: cardData.summary.totalDistance,
-                              averageSpeed: cardData.summary.totalTime
-                                ? cardData.summary.totalDistance /
-                                  (cardData.summary.totalTime / 3600)
-                                : 0,
-                              totalTime: cardData.summary.totalTime,
-                              count: cardData.summary.count,
-                              maxDistance: cardData.summary.maxDistance,
-                              maxSpeed: cardData.summary.maxSpeed,
-                              location: cardData.summary.location,
-                              totalElevationGain: SHOW_ELEVATION_GAIN
-                                ? cardData.summary.totalElevationGain
-                                : undefined,
-                              averageHeartRate:
-                                cardData.summary.heartRateCount > 0
-                                  ? cardData.summary.totalHeartRate /
-                                    cardData.summary.heartRateCount
-                                  : undefined,
-                            }}
-                            dailyDistances={cardData.summary.dailyDistances}
-                            interval={interval}
-                            activities={
-                              interval === 'day'
-                                ? cardData.summary.activities
-                                : undefined
-                            }
-                          />
-                        )
-                      )}
-                    </div>
-                  )}
-                </VirtualList>
+                  dailyDistances={dataList[0].summary.dailyDistances}
+                  interval={interval}
+                  activities={
+                    interval === 'day'
+                      ? dataList[0].summary.activities
+                      : undefined
+                  }
+                />
               )}
             </div>
-          </div>
-
-          {isExportingAll && (
-            <div ref={exportAllRef} className={styles.exportAllContainer}>
-              {exportRowGroups.map((row, rowIndex) => (
-                <div key={rowIndex} className={styles.exportAllRow}>
-                  {row.map((cardData) => (
-                    <ActivityCard
-                      key={cardData.period}
-                      period={cardData.period}
-                      summary={{
-                        totalDistance: cardData.summary.totalDistance,
-                        averageSpeed: cardData.summary.totalTime
-                          ? cardData.summary.totalDistance /
-                            (cardData.summary.totalTime / 3600)
-                          : 0,
-                        totalTime: cardData.summary.totalTime,
-                        count: cardData.summary.count,
-                        maxDistance: cardData.summary.maxDistance,
-                        maxSpeed: cardData.summary.maxSpeed,
-                        location: cardData.summary.location,
-                        totalElevationGain: SHOW_ELEVATION_GAIN
-                          ? cardData.summary.totalElevationGain
-                          : undefined,
-                        averageHeartRate:
-                          cardData.summary.heartRateCount > 0
-                            ? cardData.summary.totalHeartRate /
-                              cardData.summary.heartRateCount
-                            : undefined,
+            <div className={styles.summaryInner}>
+              <div style={{ width: rowWidth }}>
+                {loading ? (
+                  <div
+                    style={{
+                      height: filterRef.current
+                        ? `${Math.max(100, window.innerHeight - (filterRef.current.clientHeight || 0) - 40)}px`
+                        : '100vh',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <div
+                      style={{
+                        padding: 20,
+                        color: 'var(--color-run-table-thead)',
                       }}
-                      dailyDistances={cardData.summary.dailyDistances}
-                      interval={interval}
-                      activities={
-                        interval === 'day'
-                          ? cardData.summary.activities
-                          : undefined
-                      }
-                    />
-                  ))}
-                </div>
-              ))}
+                    >
+                      {LOADING_TEXT}
+                    </div>
+                  </div>
+                ) : (
+                  <VirtualList
+                    key={`${sportType}-${interval}-${itemsPerRow}`}
+                    data={calcGroup}
+                    height={listHeight}
+                    itemHeight={rowHeight}
+                    itemKey={(row: RowGroup) => row[0]?.period ?? ''}
+                    styles={VIRTUAL_LIST_STYLES}
+                  >
+                    {(row: RowGroup) => (
+                      <div
+                        ref={virtualListRef}
+                        className={styles.rowContainer}
+                        style={{ gap: `${gap}px` }}
+                      >
+                        {row.map(
+                          (cardData: {
+                            period: string;
+                            summary: ActivitySummary;
+                          }) => (
+                            <ActivityCard
+                              key={cardData.period}
+                              period={cardData.period}
+                              summary={{
+                                totalDistance: cardData.summary.totalDistance,
+                                averageSpeed: cardData.summary.totalTime
+                                  ? cardData.summary.totalDistance /
+                                    (cardData.summary.totalTime / 3600)
+                                  : 0,
+                                totalTime: cardData.summary.totalTime,
+                                count: cardData.summary.count,
+                                maxDistance: cardData.summary.maxDistance,
+                                maxSpeed: cardData.summary.maxSpeed,
+                                location: cardData.summary.location,
+                                totalElevationGain: SHOW_ELEVATION_GAIN
+                                  ? cardData.summary.totalElevationGain
+                                  : undefined,
+                                averageHeartRate:
+                                  cardData.summary.heartRateCount > 0
+                                    ? cardData.summary.totalHeartRate /
+                                      cardData.summary.heartRateCount
+                                    : undefined,
+                              }}
+                              dailyDistances={cardData.summary.dailyDistances}
+                              interval={interval}
+                              activities={
+                                interval === 'day'
+                                  ? cardData.summary.activities
+                                  : undefined
+                              }
+                            />
+                          )
+                        )}
+                      </div>
+                    )}
+                  </VirtualList>
+                )}
+              </div>
             </div>
-          )}
-        </div>
+
+            {isExportingAll && (
+              <div ref={exportAllRef} className={styles.exportAllContainer}>
+                {exportRowGroups.map((row, rowIndex) => (
+                  <div key={rowIndex} className={styles.exportAllRow}>
+                    {row.map((cardData) => (
+                      <ActivityCard
+                        key={cardData.period}
+                        period={cardData.period}
+                        summary={{
+                          totalDistance: cardData.summary.totalDistance,
+                          averageSpeed: cardData.summary.totalTime
+                            ? cardData.summary.totalDistance /
+                              (cardData.summary.totalTime / 3600)
+                            : 0,
+                          totalTime: cardData.summary.totalTime,
+                          count: cardData.summary.count,
+                          maxDistance: cardData.summary.maxDistance,
+                          maxSpeed: cardData.summary.maxSpeed,
+                          location: cardData.summary.location,
+                          totalElevationGain: SHOW_ELEVATION_GAIN
+                            ? cardData.summary.totalElevationGain
+                            : undefined,
+                          averageHeartRate:
+                            cardData.summary.heartRateCount > 0
+                              ? cardData.summary.totalHeartRate /
+                                cardData.summary.heartRateCount
+                              : undefined,
+                        }}
+                        dailyDistances={cardData.summary.dailyDistances}
+                        interval={interval}
+                        activities={
+                          interval === 'day'
+                            ? cardData.summary.activities
+                            : undefined
+                        }
+                      />
+                    ))}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </Card>
       )}
     </div>
   );
