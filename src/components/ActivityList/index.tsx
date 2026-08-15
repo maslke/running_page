@@ -19,21 +19,15 @@ import {
 import activities from '@/static/activities.json';
 import styles from './style.module.css';
 import { ACTIVITY_TOTAL } from '@/utils/const';
-import { totalStat, yearSummaryStats } from '@assets/index';
+import { yearSummaryStats } from '@assets/index';
 import { loadSvgComponent } from '@/utils/svgUtils';
 import { SHOW_ELEVATION_GAIN } from '@/utils/const';
 import RoutePreview from '@/components/RoutePreview';
 import ExportButton from '@/components/ExportButton';
 import Card from '@/components/Card';
+import MonthOfLife from '@/components/MonthOfLife';
 import { Activity } from '@/utils/utils';
 const EXPORT_CARDS_PER_ROW = 6;
-
-const MonthOfLifeSvg = (sportType: string) => {
-  const path = sportType === 'all' ? './mol.svg' : `./mol_${sportType}.svg`;
-  return lazy(() => loadSvgComponent(totalStat, path));
-};
-
-const AllSvg = MonthOfLifeSvg('all');
 
 // Cache for year summary lazy components to prevent flickering
 const yearSummaryCache: Record<
@@ -652,18 +646,16 @@ const ActivityList: React.FC = () => {
                 </button>
               ))}
             </div>
-            <Suspense fallback={<div>Loading SVG...</div>}>
-              {selectedYear ? (
-                (() => {
+            {selectedYear ? (
+              <Suspense fallback={<div>Loading SVG...</div>}>
+                {(() => {
                   const YearSvg = getYearSummarySvg(selectedYear);
                   return <YearSvg className={styles.yearSummarySvg} />;
-                })()
-              ) : (
-                <>
-                  <AllSvg />
-                </>
-              )}
-            </Suspense>
+                })()}
+              </Suspense>
+            ) : (
+              <MonthOfLife activities={activities as Activity[]} />
+            )}
           </div>
         </Card>
       )}
