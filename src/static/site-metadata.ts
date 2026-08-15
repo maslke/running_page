@@ -7,6 +7,7 @@ interface ISiteMetadataResult {
     name: string;
     url: string;
   }[];
+  birthDate: string;
 }
 
 const getBasePath = () => {
@@ -19,6 +20,7 @@ const data: ISiteMetadataResult = {
   siteUrl: 'https://maslke.space',
   logo: 'https://avatars.githubusercontent.com/u/6869592?v=4',
   description: 'Personal site and blog',
+  birthDate: '1989-03',
   navLinks: [
     {
       name: 'Home',
