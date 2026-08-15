@@ -48,5 +48,20 @@ requires = ["pdm-backend"]
 build-backend = "pdm.backend"
 
 
+[tool.ruff]
+target-version = "py312"
+
+[tool.ruff.lint]
+ignore = [
+    "BLE001",
+    "TRY002",
+    "DTZ001",
+    "DTZ005",
+    "DTZ006",
+    "DTZ007",
+    "ASYNC230",
+    "S110",
+]
+
 [tool.pdm]
 distribution = true
