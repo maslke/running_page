@@ -16,10 +16,29 @@
     var(--color-activity-card)
   );
   --heatmap-level-4: var(--color-primary);
+  --heatmap-cell: 14px;
+  --heatmap-gap: 3px;
+  --heatmap-font: 10px;
 
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+@media (max-width: 768px) {
+  .heatmapWrapper {
+    --heatmap-cell: 8px;
+    --heatmap-gap: 2px;
+    --heatmap-font: 7px;
+  }
+}
+
+@media (max-width: 480px) {
+  .heatmapWrapper {
+    --heatmap-cell: 5px;
+    --heatmap-gap: 1px;
+    --heatmap-font: 6px;
+  }
 }
 
 .yearSection {
@@ -48,64 +67,68 @@
 
 .heatmapScroll {
   overflow: hidden;
+  width: 100%;
 }
 
 .heatmap {
   display: flex;
-  gap: 4px;
-  min-width: max-content;
+  gap: 3px;
+  width: 100%;
 }
 
 .dayLabels {
   display: flex;
   flex-direction: column;
-  gap: 3px;
-  padding-top: 22px;
+  gap: var(--heatmap-gap);
+  padding-top: calc(var(--heatmap-cell) * 1.4);
+  flex-shrink: 0;
 }
 
 .dayLabel {
-  height: 14px;
-  font-size: 10px;
-  line-height: 14px;
+  height: var(--heatmap-cell);
+  font-size: var(--heatmap-font);
+  line-height: var(--heatmap-cell);
   color: var(--color-run-table-thead);
   text-align: right;
-  padding-right: 6px;
+  padding-right: 4px;
 }
 
 .gridArea {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: var(--heatmap-gap);
+  flex: 1;
+  min-width: 0;
 }
 
 .monthLabels {
   display: grid;
-  grid-auto-columns: 17px;
-  height: 18px;
+  grid-auto-columns: calc(var(--heatmap-cell) + var(--heatmap-gap));
+  height: calc(var(--heatmap-cell) * 1.2);
 }
 
 .monthLabel {
-  font-size: 10px;
-  line-height: 18px;
+  font-size: var(--heatmap-font);
+  line-height: calc(var(--heatmap-cell) * 1.2);
   color: var(--color-run-table-thead);
   white-space: nowrap;
 }
 
 .grid {
   display: flex;
-  gap: 3px;
+  gap: var(--heatmap-gap);
 }
 
 .weekColumn {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: var(--heatmap-gap);
 }
 
 .cell {
-  width: 14px;
-  height: 14px;
-  border-radius: 3px;
+  width: var(--heatmap-cell);
+  height: var(--heatmap-cell);
+  border-radius: 2px;
   transition: outline 0.1s ease;
 }
 
@@ -127,13 +150,13 @@
 }
 
 .legendText {
-  font-size: 10px;
+  font-size: var(--heatmap-font);
   color: var(--color-run-table-thead);
   padding: 0 3px;
 }
 
 .legendCell {
-  width: 14px;
-  height: 14px;
-  border-radius: 3px;
+  width: var(--heatmap-cell);
+  height: var(--heatmap-cell);
+  border-radius: 2px;
 }
