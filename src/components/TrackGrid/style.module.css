@@ -26,14 +26,17 @@
   height: auto;
 }
 
-.track {
+.trackGroup {
   cursor: pointer;
+}
+
+.track {
   transition:
     opacity 0.2s ease,
     stroke-width 0.2s ease;
 }
 
-.track:hover {
+.trackGroup:hover .track {
   opacity: 0.7;
 }
 
