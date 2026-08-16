@@ -196,19 +196,33 @@ const TrackGrid = ({
           const isSelected = selectedRunId === item.runId;
           const dimmed = selectedRunId != null && !isSelected;
           return (
-            <path
+            <g
               key={i}
-              d={item.d}
-              stroke={item.color}
-              fill="none"
-              strokeWidth={isSelected ? 1.6 : 0.8}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className={`${styles.track} ${dimmed ? styles.trackDimmed : ''} ${isSelected ? styles.trackSelected : ''}`}
               onClick={() => handleClick(item.runId)}
+              className={styles.trackGroup}
             >
-              <title>{item.title}</title>
-            </path>
+              <path
+                d={item.d}
+                stroke="transparent"
+                fill="none"
+                strokeWidth={8}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                style={{ pointerEvents: 'stroke' }}
+              />
+              <path
+                d={item.d}
+                stroke={item.color}
+                fill="none"
+                strokeWidth={isSelected ? 1.6 : 0.8}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className={`${styles.track} ${dimmed ? styles.trackDimmed : ''} ${isSelected ? styles.trackSelected : ''}`}
+                style={{ pointerEvents: 'none' }}
+              >
+                <title>{item.title}</title>
+              </path>
+            </g>
           );
         })}
       </svg>
