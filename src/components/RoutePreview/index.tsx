@@ -64,9 +64,9 @@ const RoutePreview: React.FC<RoutePreviewProps> = ({
   const boundsWidth = bounds.maxLng - bounds.minLng;
   const boundsHeight = bounds.maxLat - bounds.minLat;
 
-  // SVG dimensions
+  // SVG dimensions (viewBox-based, scales to fit container)
   const svgWidth = 250;
-  const svgHeight = 150;
+  const svgHeight = 200;
   const svgPadding = 10;
   const drawWidth = svgWidth - 2 * svgPadding;
   const drawHeight = svgHeight - 2 * svgPadding;
@@ -80,7 +80,7 @@ const RoutePreview: React.FC<RoutePreviewProps> = ({
 
   return (
     <div className={`${styles.routePreview} ${className || ''}`}>
-      <svg width={svgWidth} height={svgHeight} className={styles.routeSvg}>
+      <svg viewBox={`0 0 ${svgWidth} ${svgHeight}`} className={styles.routeSvg}>
         {/* Background */}
         <rect
           width={svgWidth}

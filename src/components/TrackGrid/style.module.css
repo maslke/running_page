@@ -2,6 +2,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  position: relative;
 }
 
 .header {
@@ -67,4 +68,31 @@
   width: 10px;
   height: 10px;
   border-radius: 2px;
+}
+
+.tooltip {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  background-color: var(--color-activity-card);
+  border: 1px solid var(--color-run-row-hover-background);
+  border-radius: 6px;
+  padding: 6px 10px;
+  pointer-events: none;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px var(--color-card-shadow);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.tooltipDate {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.tooltipInfo {
+  font-size: 0.7rem;
+  color: var(--color-run-table-thead);
 }
