@@ -85,7 +85,7 @@ const MonthOfLife: React.FC<MonthOfLifeProps> = ({
   };
 
   const viewBoxWidth = 360;
-  const viewBoxHeight = 200;
+  const viewBoxHeight = 220;
   const gridOffsetX = 8;
   const gridOffsetY = 18;
   const gridWidth = viewBoxWidth - gridOffsetX * 2;
@@ -94,7 +94,7 @@ const MonthOfLife: React.FC<MonthOfLifeProps> = ({
   const spacingY = gridHeight / ROWS;
   const radius = (Math.min(spacingX, spacingY) / 2) * 0.82;
 
-  const footerY = viewBoxHeight - 10;
+  const footerY = viewBoxHeight - 12;
 
   return (
     <div className={styles.container}>
@@ -133,26 +133,26 @@ const MonthOfLife: React.FC<MonthOfLifeProps> = ({
           );
         })}
 
-        <text x={gridOffsetX} y={footerY - 4} className={styles.label}>
+        <text x={gridOffsetX} y={footerY - 6} className={styles.label}>
           Runner
         </text>
-        <text x={gridOffsetX} y={footerY + 3} className={styles.userName}>
+        <text x={gridOffsetX} y={footerY + 4} className={styles.userName}>
           {userName}
         </text>
 
-        <text x="200" y={footerY - 4} className={styles.label}>
+        <text x="150" y={footerY - 6} className={styles.label}>
           STATISTICS
         </text>
-        <text x="200" y={footerY + 2} className={styles.stat}>
+        <text x="150" y={footerY + 4} className={styles.stat}>
           Number: {totalCount}
         </text>
-        <text x="240" y={footerY + 2} className={styles.stat}>
+        <text x="200" y={footerY + 4} className={styles.stat}>
           Weekly: {weeklyAvg.toFixed(1)}
         </text>
-        <text x="280" y={footerY + 2} className={styles.stat}>
+        <text x="255" y={footerY + 4} className={styles.stat}>
           Total: {(totalDistance / 1000).toFixed(1)} km
         </text>
-        <text x="325" y={footerY + 2} className={styles.stat}>
+        <text x="320" y={footerY + 4} className={styles.stat}>
           Avg:{' '}
           {totalCount > 0
             ? (totalDistance / 1000 / totalCount).toFixed(1)

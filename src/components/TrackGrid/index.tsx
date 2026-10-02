@@ -1,4 +1,4 @@
-import { useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback, useState, useRef } from 'react';
 import { Activity, Coordinate, pathForRun } from '@/utils/utils';
 import styles from './style.module.css';
 
@@ -13,47 +13,23 @@ interface TrackData {
   distance: number;
   path: Coordinate[];
   date: string;
+  name: string;
 }
 
 const SPECIAL_DISTANCE_1 = 10;
 const SPECIAL_DISTANCE_2 = 20;
-const MAX_POINTS_PER_TRACK = 80;
 
-function simplifyPath(path: Coordinate[], maxPoints: number): Coordinate[] {
-  if (path.length <= maxPoints) return path;
-  const step = (path.length - 1) / (maxPoints - 1);
-  const result: Coordinate[] = [];
-  for (let i = 0; i < maxPoints - 1; i++) {
-    result.push(path[Math.round(i * step)]);
-  }
-  result.push(path[path.length - 1]);
-  return result;
-}
+const COLS_PER_ROW = 5;
 
 function computeGrid(
   count: number,
-  width: number,
-  height: number
+  width: number
 ): { cellSize: number; cols: number; rows: number } | null {
   if (count === 0) return null;
-
-  let bestSize = 0;
-  let bestCols = 1;
-  let bestRows = 1;
-
-  for (let cols = 1; cols <= count; cols++) {
-    const rows = Math.ceil(count / cols);
-    const sizeX = width / cols;
-    const sizeY = height / rows;
-    const size = Math.min(sizeX, sizeY);
-    if (size > bestSize) {
-      bestSize = size;
-      bestCols = cols;
-      bestRows = rows;
-    }
-  }
-
-  return { cellSize: bestSize, cols: bestCols, rows: bestRows };
+  const cols = COLS_PER_ROW;
+  const rows = Math.ceil(count / cols);
+  const cellSize = width / cols;
+  return { cellSize, cols, rows };
 }
 
 function projectTrack(
@@ -122,8 +98,9 @@ const TrackGrid = ({
       filtered.push({
         runId: act.run_id,
         distance: distKm,
-        path: simplifyPath(rawPath, MAX_POINTS_PER_TRACK),
+        path: rawPath,
         date: act.start_date_local.slice(0, 10),
+        name: act.name || '',
       });
     }
     filtered.sort(
@@ -133,16 +110,15 @@ const TrackGrid = ({
   }, [activities]);
 
   const svgWidth = 900;
-  const svgHeight = useMemo(() => {
-    if (tracks.length === 0) return 200;
-    const grid = computeGrid(tracks.length, svgWidth, svgWidth);
-    if (!grid) return 200;
-    return grid.rows * grid.cellSize;
-  }, [tracks]);
 
   const gridLayout = useMemo(() => {
-    return computeGrid(tracks.length, svgWidth, svgHeight);
-  }, [tracks, svgHeight]);
+    return computeGrid(tracks.length, svgWidth);
+  }, [tracks]);
+
+  const svgHeight = useMemo(() => {
+    if (!gridLayout) return 200;
+    return gridLayout.rows * gridLayout.cellSize;
+  }, [gridLayout]);
 
   const pathData = useMemo(() => {
     if (!gridLayout) return [];
@@ -161,7 +137,11 @@ const TrackGrid = ({
         d,
         color,
         runId: track.runId,
-        title: `${track.date} ${track.distance.toFixed(1)} km`,
+        date: track.date,
+        distance: track.distance,
+        name: track.name,
+        centerX: offsetX + cellSize / 2,
+        centerY: offsetY + cellSize / 2,
       };
     });
   }, [tracks, gridLayout]);
@@ -175,6 +155,50 @@ const TrackGrid = ({
     [onTrackClick]
   );
 
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [tooltip, setTooltip] = useState<{
+    x: number;
+    y: number;
+    date: string;
+    distance: number;
+    name: string;
+  } | null>(null);
+
+  const handleMouseEnter = useCallback(
+    (e: React.MouseEvent, item: (typeof pathData)[number]) => {
+      const container = containerRef.current;
+      if (!container) return;
+      const rect = container.getBoundingClientRect();
+      setTooltip({
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top - 8,
+        date: item.date,
+        distance: item.distance,
+        name: item.name,
+      });
+    },
+    [pathData]
+  );
+
+  const handleMouseMove = useCallback(
+    (e: React.MouseEvent) => {
+      if (!tooltip) return;
+      const container = containerRef.current;
+      if (!container) return;
+      const rect = container.getBoundingClientRect();
+      setTooltip((prev) =>
+        prev
+          ? { ...prev, x: e.clientX - rect.left, y: e.clientY - rect.top - 8 }
+          : null
+      );
+    },
+    [tooltip]
+  );
+
+  const handleMouseLeave = useCallback(() => {
+    setTooltip(null);
+  }, []);
+
   if (tracks.length === 0) {
     return null;
   }
@@ -182,7 +206,7 @@ const TrackGrid = ({
   const viewBox = `0 0 ${svgWidth} ${svgHeight}`;
 
   return (
-    <div className={styles.trackGrid}>
+    <div className={styles.trackGrid} ref={containerRef}>
       <div className={styles.header}>
         <span className={styles.title}>Over {SPECIAL_DISTANCE_1} km Runs</span>
         <span className={styles.count}>{tracks.length} tracks</span>
@@ -191,6 +215,7 @@ const TrackGrid = ({
         viewBox={viewBox}
         className={styles.svg}
         preserveAspectRatio="xMidYMid meet"
+        onMouseMove={handleMouseMove}
       >
         {pathData.map((item, i) => {
           const isSelected = selectedRunId === item.runId;
@@ -199,6 +224,8 @@ const TrackGrid = ({
             <g
               key={i}
               onClick={() => handleClick(item.runId)}
+              onMouseEnter={(e) => handleMouseEnter(e, item)}
+              onMouseLeave={handleMouseLeave}
               className={styles.trackGroup}
             >
               <path
@@ -219,13 +246,23 @@ const TrackGrid = ({
                 strokeLinejoin="round"
                 className={`${styles.track} ${dimmed ? styles.trackDimmed : ''} ${isSelected ? styles.trackSelected : ''}`}
                 style={{ pointerEvents: 'none' }}
-              >
-                <title>{item.title}</title>
-              </path>
+              />
             </g>
           );
         })}
       </svg>
+      {tooltip && (
+        <div
+          className={styles.tooltip}
+          style={{ left: tooltip.x, top: tooltip.y }}
+        >
+          <span className={styles.tooltipDate}>{tooltip.date}</span>
+          <span className={styles.tooltipInfo}>
+            {tooltip.distance.toFixed(1)} km
+            {tooltip.name && ` · ${tooltip.name}`}
+          </span>
+        </div>
+      )}
       <div className={styles.legend}>
         <span className={styles.legendItem}>
           <span
