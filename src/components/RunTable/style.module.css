@@ -1,29 +1,93 @@
+.mobileCard {
+  display: none;
+}
+
 @media only screen and (max-width: 768px) {
-  .tableContainer {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+  .runTable :is(thead) {
+    display: none;
   }
 
-  .runTable {
-    min-width: 650px;
+  .runRow {
+    display: none;
+  }
+
+  .mobileCard {
+    display: block;
+    cursor: pointer;
+    padding: 0.75rem;
+    border-radius: 0.6rem;
+    background-color: var(--color-run-row-hover-background);
+    transition: all 0.15s ease;
+    font-family: var(--font-mono);
+    color: var(--color-run-table-thead);
+  }
+
+  .mobileCard:active {
+    transform: scale(0.98);
+  }
+
+  .mobileCardSelected {
+    background-color: var(--color-activity-card);
+    box-shadow: inset 3px 0 0 var(--color-selected);
+    color: var(--color-primary);
+  }
+
+  .mobileCardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 0.5rem;
+  }
+
+  .mobileCardTitle {
     font-size: 0.8rem;
-  }
-
-  .runTable th,
-  .runTable td {
-    padding: 0.25rem !important;
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
     white-space: nowrap;
-    min-width: 60px;
+    flex: 1;
+    margin-right: 0.5rem;
   }
 
-  .runTable th:first-child,
-  .runTable td:first-child {
-    min-width: 100px;
+  .mobileCardDate {
+    font-size: 0.7rem;
+    opacity: 0.5;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
 
-  .runTable th:last-child,
-  .runTable td:last-child {
-    min-width: 80px;
+  .mobileCardStats {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .mobileCardStat {
+    display: flex;
+    flex-direction: column;
+    min-width: 3rem;
+  }
+
+  .mobileCardValue {
+    font-size: 0.82rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.2;
+  }
+
+  .mobileCardLabel {
+    font-size: 0.6rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    opacity: 0.45;
+  }
+
+  .tableContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    overflow-x: hidden;
   }
 }
 

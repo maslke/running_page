@@ -23,7 +23,6 @@ import {
   COUNTRY_FILL_COLOR,
   USE_DASH_LINE,
   LINE_OPACITY,
-  MAP_HEIGHT,
   PRIVACY_MODE,
   LIGHTS_ON,
   MAP_TILE_VENDOR,
@@ -54,6 +53,8 @@ interface IRunMapProps {
   animationTrigger?: number;
 }
 
+const getMapHeight = () => (window.innerWidth <= 768 ? 250 : 420);
+
 const RunMap = ({
   title,
   viewState,
@@ -64,6 +65,14 @@ const RunMap = ({
   const { countries, provinces } = useActivities();
   const mapRef = useRef<MapRef>(null);
   const [lights, setLights] = useState(PRIVACY_MODE ? false : LIGHTS_ON);
+  const [mapHeight, setMapHeight] = useState(getMapHeight);
+
+  useEffect(() => {
+    const handleResize = () => setMapHeight(getMapHeight());
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   // layers that should remain visible when lights are off
   const keepWhenLightsOff = ['runs2', 'animated-run'];
   const [mapGeoData, setMapGeoData] =
@@ -275,10 +284,10 @@ const RunMap = ({
   const style: React.CSSProperties = useMemo(
     () => ({
       width: '100%',
-      height: MAP_HEIGHT,
-      maxWidth: '100%', // Prevent overflow on mobile
+      height: mapHeight,
+      maxWidth: '100%',
     }),
-    []
+    [mapHeight]
   );
 
   const fullscreenButton: React.CSSProperties = useMemo(

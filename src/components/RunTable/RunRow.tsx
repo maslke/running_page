@@ -27,8 +27,9 @@ const RunRow = ({
   const paceParts = run.average_speed ? formatPace(run.average_speed) : null;
   const heartRate = run.average_heartrate;
   const runTime = formatRunTime(run.moving_time);
+  const isSelected = runIndex === elementIndex;
   const handleClick = () => {
-    if (runIndex === elementIndex) {
+    if (isSelected) {
       setRunIndex(-1);
       locateActivity([]);
       return;
@@ -38,19 +39,65 @@ const RunRow = ({
   };
 
   return (
-    <tr
-      className={`${styles.runRow} ${runIndex === elementIndex ? styles.selected : ''}`}
-      key={run.start_date_local}
-      onClick={handleClick}
-    >
-      <td>{titleForRun(run)}</td>
-      <td>{distance}</td>
-      {SHOW_ELEVATION_GAIN && <td>{(run.elevation_gain ?? 0.0).toFixed(1)}</td>}
-      {paceParts && <td>{paceParts}</td>}
-      <td>{heartRate && heartRate.toFixed(0)}</td>
-      <td>{runTime}</td>
-      <td className={styles.runDate}>{run.start_date_local}</td>
-    </tr>
+    <>
+      <tr
+        className={`${styles.runRow} ${isSelected ? styles.selected : ''}`}
+        key={run.start_date_local}
+        onClick={handleClick}
+      >
+        <td>{titleForRun(run)}</td>
+        <td>{distance}</td>
+        {SHOW_ELEVATION_GAIN && (
+          <td>{(run.elevation_gain ?? 0.0).toFixed(1)}</td>
+        )}
+        {paceParts && <td>{paceParts}</td>}
+        <td>{heartRate && heartRate.toFixed(0)}</td>
+        <td>{runTime}</td>
+        <td className={styles.runDate}>{run.start_date_local}</td>
+      </tr>
+
+      <div
+        className={`${styles.mobileCard} ${isSelected ? styles.mobileCardSelected : ''}`}
+        onClick={handleClick}
+      >
+        <div className={styles.mobileCardHeader}>
+          <span className={styles.mobileCardTitle}>{titleForRun(run)}</span>
+          <span className={styles.mobileCardDate}>{run.start_date_local}</span>
+        </div>
+        <div className={styles.mobileCardStats}>
+          <div className={styles.mobileCardStat}>
+            <span className={styles.mobileCardValue}>{distance}</span>
+            <span className={styles.mobileCardLabel}>KM</span>
+          </div>
+          {paceParts && (
+            <div className={styles.mobileCardStat}>
+              <span className={styles.mobileCardValue}>{paceParts}</span>
+              <span className={styles.mobileCardLabel}>Pace</span>
+            </div>
+          )}
+          <div className={styles.mobileCardStat}>
+            <span className={styles.mobileCardValue}>{runTime}</span>
+            <span className={styles.mobileCardLabel}>Time</span>
+          </div>
+          {heartRate && (
+            <div className={styles.mobileCardStat}>
+              <span className={styles.mobileCardValue}>
+                {heartRate.toFixed(0)}
+              </span>
+              <span className={styles.mobileCardLabel}>BPM</span>
+            </div>
+          )}
+          {SHOW_ELEVATION_GAIN && (
+            <div className={styles.mobileCardStat}>
+              <span className={styles.mobileCardValue}>
+                {(run.elevation_gain ?? 0.0).toFixed(0)}
+              </span>
+              <span className={styles.mobileCardLabel}>Elev</span>
+            </div>
+          )}
+        </div>
+      </div>
+    </>
   );
 };
 

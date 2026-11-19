@@ -5,7 +5,6 @@ import styles from './style.module.css';
 
 interface MonthOfLifeProps {
   activities: Activity[];
-  userName?: string;
 }
 
 interface MonthData {
@@ -20,10 +19,7 @@ const TOTAL_MONTHS = 1200;
 const COLS = 36;
 const ROWS = Math.ceil(TOTAL_MONTHS / COLS);
 
-const MonthOfLife: React.FC<MonthOfLifeProps> = ({
-  activities,
-  userName = 'Runner',
-}) => {
+const MonthOfLife: React.FC<MonthOfLifeProps> = ({ activities }) => {
   const { birthYear, birthMonth } = useMemo(() => {
     const parts = siteMetadata.birthDate.split('-');
     return { birthYear: parseInt(parts[0]), birthMonth: parseInt(parts[1]) };
@@ -85,7 +81,7 @@ const MonthOfLife: React.FC<MonthOfLifeProps> = ({
   };
 
   const viewBoxWidth = 360;
-  const viewBoxHeight = 220;
+  const viewBoxHeight = 240;
   const gridOffsetX = 8;
   const gridOffsetY = 18;
   const gridWidth = viewBoxWidth - gridOffsetX * 2;
@@ -94,7 +90,9 @@ const MonthOfLife: React.FC<MonthOfLifeProps> = ({
   const spacingY = gridHeight / ROWS;
   const radius = (Math.min(spacingX, spacingY) / 2) * 0.82;
 
-  const footerY = viewBoxHeight - 12;
+  const separatorY = gridOffsetY + gridHeight + 6;
+  const statValueY = separatorY + 18;
+  const statLabelY = statValueY + 8;
 
   return (
     <div className={styles.container}>
@@ -133,31 +131,97 @@ const MonthOfLife: React.FC<MonthOfLifeProps> = ({
           );
         })}
 
-        <text x={gridOffsetX} y={footerY - 6} className={styles.label}>
-          Runner
+        <line
+          x1={gridOffsetX}
+          y1={separatorY}
+          x2={viewBoxWidth - gridOffsetX}
+          y2={separatorY}
+          className={styles.separator}
+        />
+
+        <text x={gridOffsetX} y={statValueY} className={styles.userName}>
+          Statistics
         </text>
-        <text x={gridOffsetX} y={footerY + 4} className={styles.userName}>
-          {userName}
+        <text x={gridOffsetX} y={statLabelY} className={styles.footerLabel}>
+          OVERVIEW
         </text>
 
-        <text x="150" y={footerY - 6} className={styles.label}>
-          STATISTICS
+        <line
+          x1="108"
+          y1={separatorY + 6}
+          x2="108"
+          y2={statLabelY + 3}
+          className={styles.divider}
+        />
+
+        <text
+          x="152"
+          y={statValueY}
+          className={styles.statValue}
+          textAnchor="middle"
+        >
+          {totalCount}
         </text>
-        <text x="150" y={footerY + 4} className={styles.stat}>
-          Number: {totalCount}
+        <text
+          x="152"
+          y={statLabelY}
+          className={styles.statLabel}
+          textAnchor="middle"
+        >
+          RUNS
         </text>
-        <text x="200" y={footerY + 4} className={styles.stat}>
-          Weekly: {weeklyAvg.toFixed(1)}
+
+        <text
+          x="216"
+          y={statValueY}
+          className={styles.statValue}
+          textAnchor="middle"
+        >
+          {weeklyAvg.toFixed(1)}
         </text>
-        <text x="255" y={footerY + 4} className={styles.stat}>
-          Total: {(totalDistance / 1000).toFixed(1)} km
+        <text
+          x="216"
+          y={statLabelY}
+          className={styles.statLabel}
+          textAnchor="middle"
+        >
+          WEEKLY
         </text>
-        <text x="320" y={footerY + 4} className={styles.stat}>
-          Avg:{' '}
+
+        <text
+          x="288"
+          y={statValueY}
+          className={styles.statValue}
+          textAnchor="middle"
+        >
+          {(totalDistance / 1000).toFixed(1)}
+        </text>
+        <text
+          x="288"
+          y={statLabelY}
+          className={styles.statLabel}
+          textAnchor="middle"
+        >
+          TOTAL KM
+        </text>
+
+        <text
+          x="348"
+          y={statValueY}
+          className={styles.statValue}
+          textAnchor="middle"
+        >
           {totalCount > 0
             ? (totalDistance / 1000 / totalCount).toFixed(1)
-            : '0'}{' '}
-          km
+            : '0'}
+        </text>
+        <text
+          x="348"
+          y={statLabelY}
+          className={styles.statLabel}
+          textAnchor="middle"
+        >
+          AVG KM
         </text>
       </svg>
     </div>

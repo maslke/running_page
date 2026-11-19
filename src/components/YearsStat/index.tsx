@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
 import YearStat from '@/components/YearStat';
 import useActivities from '@/hooks/useActivities';
-import { PLAN_TOTAL_DISTANCE_OF_CURRENT_YEAR } from '@/utils/const';
 import styles from './style.module.css';
 
 export const MetallicProgressBar = ({
@@ -63,16 +62,31 @@ export const useCurrentYearStats = () => {
     return totalDistance / 1000;
   }, [activities, currentActualYear]);
 
+  const lastYearDistance = useMemo(() => {
+    const lastYear = (parseInt(currentActualYear) - 1).toString();
+    const lastYearRuns = activities.filter(
+      (run) => run.start_date_local.slice(0, 4) === lastYear
+    );
+    const totalDistance = lastYearRuns.reduce(
+      (sum, run) => sum + (run.distance || 0),
+      0
+    );
+    return totalDistance / 1000;
+  }, [activities, currentActualYear]);
+
   const yearProgress = useMemo(() => getYearProgress(), []);
 
-  const runDistancePercent = Math.min(
-    (currentYearDistance / PLAN_TOTAL_DISTANCE_OF_CURRENT_YEAR) * 100,
-    100
-  );
+  const goalDistance =
+    lastYearDistance > 0 ? lastYearDistance : currentYearDistance;
+  const runDistancePercent =
+    goalDistance > 0
+      ? Math.min((currentYearDistance / goalDistance) * 100, 100)
+      : 0;
 
   return {
     currentActualYear,
     currentYearDistance,
+    goalDistance,
     yearProgress,
     runDistancePercent,
   };
