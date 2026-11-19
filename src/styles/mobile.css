@@ -29,23 +29,3 @@
     margin-top: 1rem !important;
   }
 }
-
-/* Additional mobile table improvements */
-@media only screen and (max-width: 480px) {
-  /* For very small screens, make table even more compact */
-  .runTable {
-    min-width: 550px !important;
-    font-size: 0.75rem !important;
-  }
-
-  .runTable th,
-  .runTable td {
-    padding: 0.2rem !important;
-    min-width: 50px !important;
-  }
-
-  .runTable th:first-child,
-  .runTable td:first-child {
-    min-width: 90px !important;
-  }
-}

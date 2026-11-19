@@ -43,23 +43,47 @@
   opacity: 0.7;
 }
 
-.label {
-  font-size: 4.5px;
-  font-family: var(--font-sans);
-  fill: var(--color-text-primary);
-  opacity: 0.6;
+.separator {
+  stroke: var(--color-text-primary);
+  stroke-width: 0.3;
+  opacity: 0.2;
+}
+
+.divider {
+  stroke: var(--color-text-primary);
+  stroke-width: 0.3;
+  opacity: 0.15;
 }
 
 .userName {
-  font-size: 7px;
+  font-size: 8px;
   font-family: var(--font-sans);
-  font-weight: bold;
+  font-weight: 800;
+  fill: var(--color-primary);
+  letter-spacing: 0.5px;
+}
+
+.footerLabel {
+  font-size: 4px;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  fill: var(--color-text-primary);
+  opacity: 0.45;
+  letter-spacing: 1px;
+}
+
+.statValue {
+  font-size: 8px;
+  font-family: var(--font-mono);
+  font-weight: 700;
   fill: var(--color-primary);
 }
 
-.stat {
-  font-size: 4.5px;
-  font-family: var(--font-mono);
+.statLabel {
+  font-size: 3.5px;
+  font-family: var(--font-sans);
+  font-weight: 600;
   fill: var(--color-text-primary);
-  opacity: 0.8;
+  opacity: 0.45;
+  letter-spacing: 0.8px;
 }
