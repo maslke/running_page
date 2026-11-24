@@ -39,6 +39,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      actions: read
       pages: write
       id-token: write
 
@@ -99,13 +100,12 @@ jobs:
         run: PATH_PREFIX=/$REPO_NAME pnpm build
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
-          # Upload dist repository
           name: pages-artifact
           path: './dist'
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v4.0.0
         with:
           artifact_name: pages-artifact
