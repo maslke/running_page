@@ -97,7 +97,28 @@ const YearStat = ({
     0
   );
 
-  const monthlyData = useMemo(() => {
+  const isTotal = year === 'Total';
+
+  const chartData = useMemo(() => {
+    if (isTotal) {
+      const yearMap: Record<string, number> = {};
+      years.forEach((y) => {
+        yearMap[y] = 0;
+      });
+
+      runs.forEach((run) => {
+        const runYear = run.start_date_local.slice(0, 4);
+        if (yearMap[runYear] !== undefined) {
+          yearMap[runYear] += (run.distance || 0) / 1000;
+        }
+      });
+
+      return years.map((y) => ({
+        label: y,
+        km: parseFloat(yearMap[y].toFixed(1)),
+      }));
+    }
+
     const monthMap: Record<number, number> = {};
     for (let i = 0; i < 12; i++) monthMap[i] = 0;
 
@@ -107,15 +128,17 @@ const YearStat = ({
     });
 
     return MONTHS.map((name, i) => ({
-      month: name,
+      label: name,
       km: parseFloat(monthMap[i].toFixed(1)),
     }));
-  }, [runs]);
+  }, [isTotal, runs, years]);
 
   const maxKm = useMemo(
-    () => Math.max(...monthlyData.map((d) => d.km), 1),
-    [monthlyData]
+    () => Math.max(...chartData.map((d) => d.km), 1),
+    [chartData]
   );
+
+  const chartHeight = isTotal ? Math.max(chartData.length * 15, 60) : 170;
 
   return (
     <div
@@ -166,22 +189,22 @@ const YearStat = ({
             <CompactStat value={`${streak}d`} label="Streak" />
             {hasHeartRate && <CompactStat value={avgHeartRate} label="BPM" />}
           </div>
-          {year !== 'Total' && hovered && (
+          {hovered && chartData.length > 0 && (
             <div
               className="mt-2.5 hidden lg:block"
-              style={{ width: '100%', height: 170 }}
+              style={{ width: '100%', height: chartHeight }}
             >
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart
-                  data={monthlyData}
+                  data={chartData}
                   layout="vertical"
                   margin={{ top: 0, right: 24, left: 0, bottom: 0 }}
                 >
                   <XAxis type="number" hide domain={[0, maxKm * 1.1]} />
                   <YAxis
                     type="category"
-                    dataKey="month"
-                    width={28}
+                    dataKey="label"
+                    width={isTotal ? 32 : 28}
                     tick={{ fontSize: 9, fill: 'var(--color-run-date)' }}
                     axisLine={false}
                     tickLine={false}
@@ -198,7 +221,7 @@ const YearStat = ({
                     formatter={(value: number) => [`${value} km`, '']}
                   />
                   <Bar dataKey="km" radius={[0, 3, 3, 0]} barSize={7}>
-                    {monthlyData.map((entry, index) => (
+                    {chartData.map((entry, index) => (
                       <Cell
                         key={index}
                         fill={
